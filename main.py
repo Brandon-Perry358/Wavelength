@@ -8,43 +8,42 @@ from PySide6.QtCore import Slot
 is_running = True
 
 @Slot()
-#play function that properly passes in the Playback class
-def play() -> bool:
-    return True
-
-def pause() -> bool:
-    return True
-    
-
-def window():
+def play():
+    print("Play button clicked, Rock on!")
     playback = Playback()
     playback.load_file('music/03 - The Son of Flynn.flac')
     playback.set_volume(1)
     playback.play()
-    playback.pause()
-    while playback.active:
-        app = QApplication(sys.argv)
-        widget = QWidget()
+    time.sleep(100)
+    #while playback.active:
+        #playback.resume()
 
-        playButton = QPushButton(widget)
-        playButton.setText("Play")
-        playButton.move(32, 16)
-        if (playButton.clicked.connect(play)) == True:
-            if not playback.playing:
-                playback.play()
-                  # put play function name hear
+def pause():
+    print("Pause button clicked, Rock off!")
+    #while playback.active:
+        #playback.pause()
+    
 
-        pauseButton = QPushButton(widget)
-        pauseButton.setText("Pause")
-        pauseButton.move(128, 16)
-        if (pauseButton.clicked.connect(pause)) == True:
-            if playback.playing:
-                playback.pause  # put play function name hear
+def window():
+    #print('Welcome to the Wavelength Music Player! Press "q" to quit.')
+    
+    app = QApplication(sys.argv)
+    widget = QWidget()
 
-        widget.setGeometry(50, 50, 256, 64)
-        widget.setWindowTitle("PyQt5 Button Click Example")
-        widget.show()
-        sys.exit(app.exec())
+    playButton = QPushButton(widget)
+    playButton.setText("Play")
+    playButton.move(32, 16)
+    playButton.clicked.connect(play)  # put play function name hear
+
+    pauseButton = QPushButton(widget)
+    pauseButton.setText("Pause")
+    pauseButton.move(128, 16)
+    pauseButton.clicked.connect(pause)  # put play function name hear
+
+    widget.setGeometry(50, 50, 256, 64)
+    widget.setWindowTitle("PyQt5 Button Click Example")
+    widget.show()
+    sys.exit(app.exec())
 
 """def main():
     print('Welcome to the Wavelength Music Player!')
