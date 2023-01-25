@@ -1,103 +1,68 @@
-from just_playback import Playback
-import keyboard
-import time
+import threading
+from PyQt5 import QtWidgets, QtGui
+import pygame
 import sys
-from PySide6.QtWidgets import QApplication, QWidget, QPushButton
+import time
+import os
+from queue import Queue
+from just_playback import Playback
+from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QFileDialog
 from PySide6.QtCore import Slot
 
-is_running = True
+def play_audio(queue):
+    # code for initializing and playing audio
+    pygame = Playback()
+    #pygame.load_file("song.mp3")
+    pygame.set_volume(1)
+    #pygame.play()
+    while True:
+        message = queue.get()
+        if message == "play/pause":
+            if pygame.playing:
+                pygame.pause()
+            else:
+                pygame.resume()
+        elif message == "stop":
+            pygame.stop()
+        elif message == "browse":
+            file = browse()
+            pygame.load_file(file)
+            pygame.play()
 
-@Slot()
-def play():
-    print("Play button clicked, Rock on!")
-    playback = Playback()
-    playback.load_file('music/03 - The Son of Flynn.flac')
-    playback.set_volume(1)
-    playback.play()
-    time.sleep(100)
-    #while playback.active:
-        #playback.resume()
+def gui(queue):
+    app = QtWidgets.QApplication(sys.argv)
+    window = QtWidgets.QMainWindow()
+    window.setGeometry(100, 100, 300, 300)
+    # code for creating the button
+    playPauseButton = QtWidgets.QPushButton("Play/Pause", window)
+    playPauseButton.clicked.connect(lambda: queue.put("play/pause"))
+    # move the button to the center of the window
+    playPauseButton.move(100, 100)
+    # code for creating the stop button
+    stopButton = QtWidgets.QPushButton("Stop", window)
+    stopButton.clicked.connect(lambda: queue.put("stop"))
+    # move the button below the play/pause button
+    stopButton.move(100, 150)
+    fileBrowserButton = QtWidgets.QPushButton("Browse", window)
+    fileBrowserButton.clicked.connect(lambda: queue.put("browse"))
+    # move the button above the play/pause button
+    fileBrowserButton.move(100, 50)
 
-def pause():
-    print("Pause button clicked, Rock off!")
-    #while playback.active:
-        #playback.pause()
-    
+    window.show()
+    sys.exit(app.exec_())
 
-def window():
-    #print('Welcome to the Wavelength Music Player! Press "q" to quit.')
-    
+def browse():
     app = QApplication(sys.argv)
     widget = QWidget()
-
-    playButton = QPushButton(widget)
-    playButton.setText("Play")
-    playButton.move(32, 16)
-    playButton.clicked.connect(play)  # put play function name hear
-
-    pauseButton = QPushButton(widget)
-    pauseButton.setText("Pause")
-    pauseButton.move(128, 16)
-    pauseButton.clicked.connect(pause)  # put play function name hear
-
     widget.setGeometry(50, 50, 256, 64)
-    widget.setWindowTitle("PyQt5 Button Click Example")
-    widget.show()
-    sys.exit(app.exec())
+    file = QFileDialog.getOpenFileName(widget, 'Open file', 'C:\Wavelength', "Audio files (*.mp3 *.wav *.flac)")
+    widget.destroy()
+    app.shutdown()
+    return file[0]
 
-"""def main():
-    print('Welcome to the Wavelength Music Player!')
-    print('Please select an option:')
-    print('1. Play a song')
-    print('2. Exit Program')
-    if input('Enter your choice: ') == '1':
-        playback = Playback() # creates an object for managing playback of a single audio file
-        playback.load_file('music/03 - The Son of Flynn.flac') # loads the audio file
-        #if the p key is pressed, play the audio file
-        playback.set_volume(1) # sets the volume to 50%
-        playback.play()
-        playback.loop_at_end(False)
-        playback.pause()
-        if input('Song Loaded. Press 1 to play the song: ') == '1':
-            playback.play()
-        while playback.active:
-            playing = playback.playing
-            if keyboard.is_pressed('2'):
-                if playing:
-                    #playing = False
-                    playback.pause()
-                    print('Song paused at ' + str(playback.curr_pos) + ' seconds. Press 1 to resume.')
-            if keyboard.is_pressed('1'):
-                if not playing:
-                    #playing = True
-                    playback.resume()
-            if keyboard.is_pressed('3'):
-                playback.seek(-5)
-                print('Skipped to: ' + str(playback.curr_pos))
-                time.sleep(0.5)
-            if keyboard.is_pressed('4'):
-                playback.seek(5)
-                print('Skipped to: ' + str(playback.curr_pos))
-                time.sleep(0.5)
-            if keyboard.is_pressed('5'):
-                print('Song ended at ' + str(playback.curr_pos) + ' seconds.')
-                playback.stop()
-                exit()
-            
-            # sets the audio file to not loop at the end
+queue = Queue()
+audio_thread = threading.Thread(target=play_audio, args=(queue,))
+gui_thread = threading.Thread(target=gui, args=(queue,))
 
-            #print(playback.curr_pos)
-
-            #if (playback.active):
-                #print('active')
-            #time.sleep(300)
-
-    else:
-        exit()"""
-
-def exit():
-    print('Thank you for using the Wavelength Music Player! Goodbye!')
-
-if __name__ == '__main__':
-    window()
-    #main()
+audio_thread.start()
+gui_thread.start()
