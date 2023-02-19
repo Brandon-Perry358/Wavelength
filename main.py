@@ -1,6 +1,5 @@
 import threading
 from PyQt5 import QtWidgets, QtGui, QtCore
-import pygame
 import sys
 import time
 import os
