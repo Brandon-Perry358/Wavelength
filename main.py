@@ -14,9 +14,7 @@ playlist = []
 def play_audio(queue):
     # code for initializing and playing audio
     player = Playback()
-    #player.load_file("song.mp3")
     player.set_volume(1)
-    #player.play()
     while True:
         message = queue.get()
         if message == "play/pause":
@@ -24,16 +22,14 @@ def play_audio(queue):
                 player.pause()
             else:
                 player.resume()
-                print(player.duration)
-                print(type(player.duration))
+                #print(player.duration)
+                #print(type(player.duration))
         elif message == "stop":
             player.stop()
         elif message == "browse":
             file = browse()
-            playlist.append(file)
-            #for song in playlist:
-                #player.load_file(song)
-                #player.play()
+            player.load_file(file)
+            player.play()
         elif message == "play playlist":
             #play the songs in order
             for song in playlist:
@@ -42,9 +38,15 @@ def play_audio(queue):
                 else:
                     player.load_file(song)
                     player.play()
-                #this plays the whole playlist, but play/pause and stop don't work
-                #while player.active:
-                    #time.sleep(1)
+                    #this plays the whole playlist, but play/pause and stop don't work
+                    while player.active:
+                        time.sleep(1)
+        elif message == "add to playlist":
+            file = browse()
+            playlist.append(file)
+        elif message == "print":
+            for song in playlist:
+                print(song)
         elif message == "close":
             player.stop()
             break
@@ -52,7 +54,8 @@ def play_audio(queue):
 def gui(queue):
     app = QtWidgets.QApplication(sys.argv)
     window = QtWidgets.QMainWindow()
-    window.setWindowTitle("Wavelength")
+    window.setWindowTitle("Wavelength Audio Player")
+    window.setWindowIcon(QtGui.QIcon("WavelengthIcon.png"))
     window.setGeometry(100, 100, 700, 500)
 
     # make program name in corner
@@ -105,13 +108,15 @@ def gui(queue):
     artistLabel.setFont(QtGui.QFont("Comic Sans MS", 12))
     #artistLabel.move(125, 390)
 
+
     # code for creating the stop button
     stopButton = QtWidgets.QPushButton("Stop", window)
     stopButton.clicked.connect(lambda: queue.put("stop"))
     # move the button below the play/pause button
     stopButton.move(175, 0)
 
-    fileBrowserButton = QtWidgets.QPushButton("Browse", window)
+
+    fileBrowserButton = QtWidgets.QPushButton("Select Song", window)
     fileBrowserButton.clicked.connect(lambda: queue.put("browse"))
     # move the button to the top bar
     fileBrowserButton.move(75, 0)
@@ -132,7 +137,7 @@ def gui(queue):
     trackLengthLabel.setGeometry(550, 375, 30, 30)
     trackLengthLabel.setText("1:34")
 
-    # OLD CODE KEPT FOR REFERENCE
+
     # code for creating the button
     #playPauseButton = QtWidgets.QPushButton("Play/Pause", window)
     #playPauseButton.clicked.connect(lambda: queue.put("play/pause"))
@@ -148,8 +153,6 @@ def gui(queue):
     # move the button above the play/pause button
     #fileBrowserButton.move(100, 50)
     #code for the play playlist button
-    # END OF OLD CODE
-
     playPlaylistButton = QtWidgets.QPushButton("Play Playlist", window)
     playPlaylistButton.clicked.connect(lambda: queue.put("play playlist"))
     # move the button above the play/pause button
@@ -159,12 +162,21 @@ def gui(queue):
     clearPlaylistButton.clicked.connect(lambda: playlist.clear())
     # move the button above the play/pause button
     clearPlaylistButton.move(375, 0)
+    # code for the add to playlist button
+    addToPlaylistButton = QtWidgets.QPushButton("Add to Playlist", window)
+    addToPlaylistButton.clicked.connect(lambda: queue.put("add to playlist"))
+    addToPlaylistButton.move(475, 0)
+    addToPlaylistButton = QtWidgets.QPushButton("Print Playlist", window)
+    addToPlaylistButton.clicked.connect(lambda: queue.put("print"))
+    addToPlaylistButton.move(575, 0)
+
 
     #put a message in the queue to stop the thread when the window is closed
     window.destroyed.connect(lambda: queue.put("close"))
 
     window.show()
     sys.exit(app.exec_())
+    
 
 def browse():
     app = QApplication(sys.argv)
