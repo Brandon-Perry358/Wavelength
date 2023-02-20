@@ -12,47 +12,47 @@ from PySide6.QtGui import QPixmap, QFont
 playlist = []
 
 def play_audio(queue):
-    
     # code for initializing and playing audio
-    pygame = Playback()
-    #pygame.load_file("song.mp3")
-    pygame.set_volume(1)
-    #pygame.play()
+    player = Playback()
+    #player.load_file("song.mp3")
+    player.set_volume(1)
+    #player.play()
     while True:
         message = queue.get()
         if message == "play/pause":
-            if pygame.playing:
-                pygame.pause()
+            if player.playing:
+                player.pause()
             else:
-                pygame.resume()
-                print(pygame.duration)
-                print(type(pygame.duration))
+                player.resume()
+                print(player.duration)
+                print(type(player.duration))
         elif message == "stop":
-            pygame.stop()
+            player.stop()
         elif message == "browse":
             file = browse()
             playlist.append(file)
             #for song in playlist:
-                #pygame.load_file(song)
-                #pygame.play()
+                #player.load_file(song)
+                #player.play()
         elif message == "play playlist":
             #play the songs in order
             for song in playlist:
                 if song == None:
                     pass
                 else:
-                    pygame.load_file(song)
-                    pygame.play()
+                    player.load_file(song)
+                    player.play()
                 #this plays the whole playlist, but play/pause and stop don't work
-                #while pygame.active:
+                #while player.active:
                     #time.sleep(1)
         elif message == "close":
-            pygame.stop()
+            player.stop()
             break
 
 def gui(queue):
     app = QtWidgets.QApplication(sys.argv)
     window = QtWidgets.QMainWindow()
+    window.setWindowTitle("Wavelength")
     window.setGeometry(100, 100, 700, 500)
 
     # make program name in corner
@@ -105,13 +105,11 @@ def gui(queue):
     artistLabel.setFont(QtGui.QFont("Comic Sans MS", 12))
     #artistLabel.move(125, 390)
 
-
     # code for creating the stop button
     stopButton = QtWidgets.QPushButton("Stop", window)
     stopButton.clicked.connect(lambda: queue.put("stop"))
     # move the button below the play/pause button
     stopButton.move(175, 0)
-
 
     fileBrowserButton = QtWidgets.QPushButton("Browse", window)
     fileBrowserButton.clicked.connect(lambda: queue.put("browse"))
@@ -134,7 +132,7 @@ def gui(queue):
     trackLengthLabel.setGeometry(550, 375, 30, 30)
     trackLengthLabel.setText("1:34")
 
-
+    # OLD CODE KEPT FOR REFERENCE
     # code for creating the button
     #playPauseButton = QtWidgets.QPushButton("Play/Pause", window)
     #playPauseButton.clicked.connect(lambda: queue.put("play/pause"))
@@ -150,6 +148,8 @@ def gui(queue):
     # move the button above the play/pause button
     #fileBrowserButton.move(100, 50)
     #code for the play playlist button
+    # END OF OLD CODE
+
     playPlaylistButton = QtWidgets.QPushButton("Play Playlist", window)
     playPlaylistButton.clicked.connect(lambda: queue.put("play playlist"))
     # move the button above the play/pause button
@@ -165,7 +165,6 @@ def gui(queue):
 
     window.show()
     sys.exit(app.exec_())
-    
 
 def browse():
     app = QApplication(sys.argv)
