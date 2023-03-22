@@ -11,7 +11,6 @@ from PySide6.QtGui import QPixmap, QFont
 
 import mutagen
 from mutagen import flac, StreamInfo
-from PIL import Image
 from io import BytesIO
 import base64
 
