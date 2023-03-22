@@ -9,21 +9,7 @@ from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QFileDialog, Q
 from PySide6.QtCore import Slot, Qt
 from PySide6.QtGui import QPixmap, QFont
 
-import mutagen
-from mutagen import flac, StreamInfo
-from io import BytesIO
-import base64
-
-#
-# audio = FLAC("music/03 - The Son of Flynn.flac")
-# print(audio)
-# print(audio.pictures)
-#
-tags = mutagen.flac.FLAC("music/03 - The Son of Flynn.flac")
-pict = tags.pictures
-print(type(pict[0].data))
-data = base64.b64decode(pict[0].data)
-# print(data)
+from tinytag import tinytag
 
 playlist = []
 queue = Queue()
@@ -40,20 +26,14 @@ class MainWindow(QtWidgets.QMainWindow):
         wavelengthLabel.setText("Wavelength")
         wavelengthLabel.move(5, 0)
 
-        #audio = mutagen.flac.FLAC("music/03 - The Son of Flynn.flac")
-        pixmap = QtGui.QPixmap()
-        metadata = mutagen.flac.FLAC("music/03 - The Son of Flynn.flac")
-        #print(metadata.tags)
-        pics = metadata.pictures
-        picData = base64.b64decode(pics[0].data)
-        #print(picData)
-        pixmap.loadFromData(picData)
-        print(picData)
-        print(metadata.pprint())
 
+        song = tinytag.TinyTag.get("music/03 - The Son of Flynn.flac", image=True)
 
         albumArt = QtWidgets.QLabel(self)
-        albumArt.setPixmap(QtGui.QPixmap(pixmap))
+        albumArt.setScaledContents(True)
+        pixmap = QtGui.QPixmap()
+        pixmap.loadFromData(song.get_image())
+        albumArt.setPixmap(pixmap)
         albumArt.setGeometry(20, 40, 400, 360)
 
         # create button
@@ -68,7 +48,7 @@ class MainWindow(QtWidgets.QMainWindow):
         # code for creating the button
         playPauseButton = QtWidgets.QPushButton("", self)
         # TODO Use Thread here
-        # playPauseButton.clicked.connect(lambda: queue.put("play/pause"))
+        playPauseButton.clicked.connect(lambda: queue.put("play/pause"))
 
         # move the button to the center of the window
         playPauseButton.move(125, 450)
@@ -105,13 +85,12 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # code for creating the stop button
         stopButton = QtWidgets.QPushButton("Stop", self)
-        #stopButton.clicked.connect(lambda: queue.put("stop"))
+        stopButton.clicked.connect(lambda: queue.put("stop"))
         # move the button below the play/pause button
         stopButton.move(175, 0)
 
-
-        fileBrowserButton = QtWidgets.QPushButton("Select Song",  self)
-        #fileBrowserButton.clicked.connect(lambda: queue.put("browse"))
+        fileBrowserButton = QtWidgets.QPushButton("Select Song", self)
+        fileBrowserButton.clicked.connect(lambda: queue.put("browse"))
         # move the button to the top bar
         fileBrowserButton.move(75, 0)
 
@@ -148,21 +127,18 @@ class MainWindow(QtWidgets.QMainWindow):
         addToPlaylistButton = QtWidgets.QPushButton("Add to Playlist", self)
         addToPlaylistButton.clicked.connect(lambda: queue.put("add to playlist"))
         addToPlaylistButton.move(475, 0)
-        addToPlaylistButton = QtWidgets.QPushButton("Print Playlist", self)
-        addToPlaylistButton.clicked.connect(lambda: queue.put("print"))
-        addToPlaylistButton.move(575, 0)
+        printPlaylistButton = QtWidgets.QPushButton("Print Playlist", self)
+        printPlaylistButton.clicked.connect(lambda: queue.put("print"))
+        printPlaylistButton.move(575, 0)
 
         # put a message in the queue to stop the thread when the window is closed
         self.destroyed.connect(lambda: queue.put("close"))
 
-
     def browse(self):
-        app = QApplication(sys.argv)
-        widget = QWidget()
+        widget = QWidget(self)
         widget.setGeometry(50, 50, 256, 64)
         file = QFileDialog.getOpenFileName(widget, 'Open file', 'C:\Wavelength', "Audio files (*.mp3 *.wav *.flac)")
         widget.destroy()
-        app.shutdown()
         if file[0] == "":
             # don't return anything
             pass
@@ -212,20 +188,19 @@ class MainWindow(QtWidgets.QMainWindow):
     def setTimeLeft(self):
         min = 0
         sec = 0
-        metadata = mutagen.flac.FLAC("music/03 - The Son of Flynn.flac")
-        min = int(metadata.info.length % 3600 / 60)
-        sec = int(metadata.info.length % 3600 % 60)
+        metadata = tinytag.TinyTag.get("music/03 - The Son of Flynn.flac")
+        min = int(metadata.duration % 3600 / 60)
+        sec = int(metadata.duration % 3600 % 60)
         retString = str(min) + ":" + str(sec)
         return retString
 
     def setSongTitle(self):
-        metadata = mutagen.flac.FLAC("music/03 - The Son of Flynn.flac")
-        return str(metadata.tags["title"][0])
+        metadata = tinytag.TinyTag.get("music/03 - The Son of Flynn.flac")
+        return str(metadata.title)
 
     def setArtist(self):
-        metadata = mutagen.flac.FLAC("music/03 - The Son of Flynn.flac")
-        return str(metadata.tags["artist"][0])
-
+        metadata =tinytag.TinyTag.get("music/03 - The Son of Flynn.flac")
+        return str(metadata.artist)
 
 
 app = QtWidgets.QApplication(sys.argv)
