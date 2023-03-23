@@ -85,6 +85,7 @@ def gui(queue, queue2):
     wavelengthLabel.move(10, 0)
 
     albumArt = QtWidgets.QLabel(window)
+    albumPixmap = QtGui.QPixmap()
     albumArt.setPixmap(QtGui.QPixmap("WavelengthArt.png"))
     albumArt.setScaledContents(True)
     albumArt.setGeometry(20, 40, 400, 360)
@@ -179,7 +180,8 @@ def gui(queue, queue2):
     timer.timeout.connect(lambda: update_playlist(playlistWidget, playlist))
     timer.timeout.connect(lambda: update_song(songLabel, currently_playing))
     timer.timeout.connect(lambda: update_artist(artistLabel, currently_playing))
-    timer.timeout.connect(lambda: update_art(albumArt, currently_playing))
+    timer.timeout.connect(lambda: update_art(albumArt, albumPixmap, currently_playing))
+    timer.timeout.connect(lambda: update_end_time(trackLengthLabel, currently_playing))
     timer.start(100)
 
     #every 100ms, update the song name
@@ -233,14 +235,22 @@ def update_artist(artistLabel, currently_playing):
         song_tag = tinytag.TinyTag.get(currently_playing[0])
         artistLabel.setText(song_tag.artist)
 
-def update_art(albumArt,  currently_playing):
+def update_art(albumArt, albumPixmap,  currently_playing):
+    if len(currently_playing) == 0:
+        pass
+    else:
+        song_tag = tinytag.TinyTag.get(currently_playing[0], image=True)
+        albumPixmap.loadFromData(song_tag.get_image())
+        albumArt.setPixmap(albumPixmap)
+
+def update_end_time(trackLengthLabel, currently_playing):
     if len(currently_playing) == 0:
         pass
     else:
         song_tag = tinytag.TinyTag.get(currently_playing[0])
-        albumPixmap = QtGui.QPixmap()
-        albumPixmap.loadFromData(song_tag.get_image())
-        albumArt.setPixmap(albumPixmap)
+        min = int(song_tag.duration % 3600 / 60)
+        sec = int(song_tag.duration % 3600 % 60)
+        trackLengthLabel.setText(str(min) + ":" + str(sec))
 
 
 queue = Queue()
