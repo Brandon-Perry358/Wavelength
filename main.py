@@ -13,6 +13,7 @@ from tinytag import tinytag
 playlist = []
 currently_playing = []
 previous_songs = []
+temp_playlist = []
 
 def play_audio(queue):
     # code for initializing and playing audio
@@ -55,12 +56,27 @@ def play_audio(queue):
                 player.stop()
                 playlist.clear()
                 currently_playing.clear()
+                previous_songs.clear()
+                temp_playlist.clear()
             #remove the first song from the currently_playing list
             else:
-                currently_playing.pop(0)
+                previous_songs.insert(0, currently_playing[0])
+                currently_playing.clear()
                 queue.put("play playlist")
         elif message == "previous song":
-            pass
+            if len(previous_songs) == 0:
+                pass
+            else:
+                player.stop()
+                temp_playlist.append(currently_playing[0])
+                currently_playing.clear()
+                currently_playing.append(previous_songs[0])
+                previous_songs.pop(0)
+                #place the song from the temp_playlist at the beginning of the playlist
+                playlist.insert(0, temp_playlist[0])
+                temp_playlist.pop(0)
+                player.load_file(currently_playing[0])
+                player.play()
         elif message == "add to playlist":
             file = browse()
             playlist.append(file)
@@ -101,6 +117,7 @@ def gui(queue):
 
     # create button
     skipBackButton = QtWidgets.QPushButton("", window)
+    skipBackButton.clicked.connect(lambda: queue.put("previous song"))
     skipBackButton.move(20, 450)
     skipBackButton.setGeometry(20, 450, 133, 35)
     skipBackButton.setStyleSheet("background-image : url(skipBackButton.png); background-repeat : no-repeat; background-position : center;")
