@@ -5,13 +5,15 @@ import time
 import os
 from queue import Queue
 from just_playback import Playback
-from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QFileDialog, QLabel
+from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QFileDialog, QLabel, QListWidget
 from PySide6.QtCore import Slot, Qt
 from PySide6.QtGui import QPixmap, QFont
+from tinytag import tinytag
 
 playlist = []
+currently_playing = []
 
-def play_audio(queue):
+def play_audio(queue, queue2):
     # code for initializing and playing audio
     player = Playback()
     player.set_volume(1)
@@ -22,50 +24,72 @@ def play_audio(queue):
                 player.pause()
             else:
                 player.resume()
-                #print(player.duration)
-                #print(type(player.duration))
         elif message == "stop":
             player.stop()
-        elif message == "browse":
-            file = browse()
-            player.load_file(file)
-            player.play()
+            playlist.clear()
+            currently_playing.clear()
         elif message == "play playlist":
-            #play the songs in order
-            for song in playlist:
-                if song == None:
-                    pass
-                else:
-                    player.load_file(song)
-                    player.play()
-                    #this plays the whole playlist, but play/pause and stop don't work
-                    while player.active:
-                        time.sleep(1)
+            if player.active:
+                player.stop()
+                #read the playlist and place the first song in the currently_playing list
+                currently_playing.append(playlist[0])
+                #remove the first song from the playlist
+                playlist.pop(0)
+                #play the song
+                player.load_file(currently_playing[0])
+                player.play()
+            if not player.active:
+                #read the playlist and place the first song in the currently_playing list
+                currently_playing.append(playlist[0])
+                #remove the first song from the playlist
+                playlist.pop(0)
+                #play the song
+                player.load_file(currently_playing[0])
+                player.play()
+        elif message == "next song":
+            #if the next song is the last song in the playlist, stop the player
+            if len(playlist) == 0:
+                player.stop()
+                playlist.clear()
+                currently_playing.clear()
+            #remove the first song from the currently_playing list
+            else:
+                currently_playing.pop(0)
+                queue.put("play playlist")
         elif message == "add to playlist":
             file = browse()
             playlist.append(file)
-        elif message == "print":
-            for song in playlist:
-                print(song)
+        elif message.startswith("volume "):
+            volume = int(message[7:])
+            player.set_volume(volume / 100)
+            print("Volume is: " + (volume).__str__())
         elif message == "close":
             player.stop()
             break
 
-def gui(queue):
+def gui(queue, queue2):
     app = QtWidgets.QApplication(sys.argv)
     window = QtWidgets.QMainWindow()
+    window.setFixedSize(775, 500)
     window.setWindowTitle("Wavelength Audio Player")
     window.setWindowIcon(QtGui.QIcon("WavelengthIcon.png"))
-    window.setGeometry(100, 100, 700, 500)
+    window.setGeometry(100, 100, 775, 500)
 
     # make program name in corner
     wavelengthLabel = QtWidgets.QLabel(window)
     wavelengthLabel.setText("Wavelength")
-    wavelengthLabel.move(5, 0)
+    wavelengthLabel.move(10, 0)
 
     albumArt = QtWidgets.QLabel(window)
-    albumArt.setPixmap(QtGui.QPixmap("Tron_Legacy_Soundtrack.jpg"))
+    albumArt.setPixmap(QtGui.QPixmap("WavelengthArt.png"))
+    albumArt.setScaledContents(True)
     albumArt.setGeometry(20, 40, 400, 360)
+
+    #make a list widget to display the playlist
+    playlistWidget = QtWidgets.QListWidget(window)
+    playlistWidget.setGeometry(500, 40, 250, 360)
+    #Display the contents of the playlist in the list widget
+        
 
     # create button
     skipBackButton = QtWidgets.QPushButton("", window)
@@ -86,6 +110,7 @@ def gui(queue):
 
     # create button
     skipForwardButton = QtWidgets.QPushButton("", window)
+    skipForwardButton.clicked.connect(lambda: queue.put("next song"))
     skipForwardButton.move(225, 450)
     skipForwardButton.setGeometry(287, 450, 133, 35)
     skipForwardButton.setStyleSheet("background-image : url(skipForwardButton.png); background-repeat : no-repeat; background-position : center;")
@@ -95,7 +120,7 @@ def gui(queue):
     # make song name under art
     songLabel = QtWidgets.QLabel(window)
     songLabel.setGeometry(25, 400, 400, 25)
-    songLabel.setText("The Son of Flynn")
+    songLabel.setText("Wavelength")
     songLabel.setAlignment(QtCore.Qt.AlignCenter)
     songLabel.setFont(QtGui.QFont("Comic Sans MS", 18, QtGui.QFont.Bold))
     #songLabel.move(125, 375)
@@ -103,7 +128,7 @@ def gui(queue):
     # make artist name under song title
     artistLabel = QtWidgets.QLabel(window)
     artistLabel.setGeometry(25, 420, 400, 40)
-    artistLabel.setText("Daft Punk")
+    artistLabel.setText("Spack & Brandon P.")
     artistLabel.setAlignment(QtCore.Qt.AlignCenter)
     artistLabel.setFont(QtGui.QFont("Comic Sans MS", 12))
     #artistLabel.move(125, 390)
@@ -113,63 +138,58 @@ def gui(queue):
     stopButton = QtWidgets.QPushButton("Stop", window)
     stopButton.clicked.connect(lambda: queue.put("stop"))
     # move the button below the play/pause button
-    stopButton.move(175, 0)
-
-
-    fileBrowserButton = QtWidgets.QPushButton("Select Song", window)
-    fileBrowserButton.clicked.connect(lambda: queue.put("browse"))
-    # move the button to the top bar
-    fileBrowserButton.move(75, 0)
+    stopButton.move(275, 0)
 
     # Show current song location
     currintPosLabel = QtWidgets.QLabel(window)
-    currintPosLabel.setGeometry(550, 50, 30, 30)
+    currintPosLabel.setGeometry(450, 50, 30, 30)
     currintPosLabel.setText("0:00")
 
     # make seek bar
     seekBar = QtWidgets.QSlider(window)
     seekBar.setOrientation(QtCore.Qt.Vertical)
-    seekBar.setGeometry(550, 75, 25, 300)
+    seekBar.setGeometry(450, 75, 25, 300)
     seekBar.setInvertedAppearance(True)
 
     # show total song time
     trackLengthLabel = QtWidgets.QLabel(window)
-    trackLengthLabel.setGeometry(550, 375, 30, 30)
+    trackLengthLabel.setGeometry(450, 375, 30, 30)
     trackLengthLabel.setText("1:34")
 
+    # make volume bar
+    volBar = QtWidgets.QSlider(window)
+    volBar.setOrientation(QtCore.Qt.Horizontal)
+    volBar.setGeometry(450, 450, 300, 35)
+    volBar.setInvertedAppearance(False)
+    volBar.setRange(0, 100)
+    volBar.setValue(100)
+    #control the volume of the player
+    volBar.valueChanged.connect(lambda: queue.put("volume " + (volBar.value()).__str__()))
 
-    # code for creating the button
-    #playPauseButton = QtWidgets.QPushButton("Play/Pause", window)
-    #playPauseButton.clicked.connect(lambda: queue.put("play/pause"))
-    # move the button to the center of the window
-    #playPauseButton.move(100, 100)
-    # code for creating the stop button
-    #stopButton = QtWidgets.QPushButton("Stop", window)
-    #stopButton.clicked.connect(lambda: queue.put("stop"))
-    # move the button below the play/pause button
-    #stopButton.move(100, 150)
-    #fileBrowserButton = QtWidgets.QPushButton("Browse", window)
-    #fileBrowserButton.clicked.connect(lambda: queue.put("browse"))
-    # move the button above the play/pause button
-    #fileBrowserButton.move(100, 50)
-    #code for the play playlist button
     playPlaylistButton = QtWidgets.QPushButton("Play Playlist", window)
     playPlaylistButton.clicked.connect(lambda: queue.put("play playlist"))
     # move the button above the play/pause button
-    playPlaylistButton.move(275, 0)
-    # code for the clear playlist button
-    clearPlaylistButton = QtWidgets.QPushButton("Clear Playlist", window)
-    clearPlaylistButton.clicked.connect(lambda: playlist.clear())
-    # move the button above the play/pause button
-    clearPlaylistButton.move(375, 0)
+    playPlaylistButton.move(175, 0)
     # code for the add to playlist button
     addToPlaylistButton = QtWidgets.QPushButton("Add to Playlist", window)
     addToPlaylistButton.clicked.connect(lambda: queue.put("add to playlist"))
-    addToPlaylistButton.move(475, 0)
-    addToPlaylistButton = QtWidgets.QPushButton("Print Playlist", window)
-    addToPlaylistButton.clicked.connect(lambda: queue.put("print"))
-    addToPlaylistButton.move(575, 0)
+    addToPlaylistButton.move(75, 0)
 
+    timer = QtCore.QTimer()
+    timer.timeout.connect(lambda: update_playlist(playlistWidget, playlist))
+    timer.timeout.connect(lambda: update_song(songLabel, currently_playing))
+    timer.timeout.connect(lambda: update_artist(artistLabel, currently_playing))
+    timer.timeout.connect(lambda: update_art(albumArt, currently_playing))
+
+    timer.start(1000)
+
+    #every 100ms, update the song name
+    #timer2 = QtCore.QTimer()
+    #timer2.timeout.connect(lambda: update_song_name(songLabel, artistLabel, queue))
+    #timer2.start(100)
+
+    #every 100ms, call the update_playback function
+    
 
     #put a message in the queue to stop the thread when the window is closed
     window.destroyed.connect(lambda: queue.put("close"))
@@ -190,10 +210,39 @@ def browse():
         pass
     else:
         return file[0]
+    
+def update_playlist(playlistWidget, playlist):
+    playlistWidget.clear()
+    for song in playlist:
+        if song == "":
+            pass
+        else:
+            song_tag = tinytag.TinyTag.get(song)
+            playlistWidget.addItem(song_tag.title + " - " + song_tag.artist)
+
+def update_song(songLabel, currently_playing):
+    for song in currently_playing:
+        song_tag = tinytag.TinyTag.get(song)
+        songLabel.setText(song_tag.title)
+
+def update_artist(artistLabel, currently_playing):
+    for song in currently_playing:
+        song_tag = tinytag.TinyTag.get(song)
+        artistLabel.setText(song_tag.artist)
+
+def update_art(albumArt,  currently_playing):
+    for song in currently_playing:
+        song_tag = tinytag.TinyTag.get(song)
+
+        albumPixmap = QtGui.QPixmap()
+        albumPixmap.loadFromData(song_tag.get_image())
+        albumArt.setPixmap(albumPixmap)
+
 
 queue = Queue()
-audio_thread = threading.Thread(target=play_audio, args=(queue,))
-gui_thread = threading.Thread(target=gui, args=(queue,))
+queue2 = Queue()
+audio_thread = threading.Thread(target=play_audio, args=(queue, queue2))
+gui_thread = threading.Thread(target=gui, args=(queue, queue2))
 
 audio_thread.start()
 gui_thread.start()
