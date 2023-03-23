@@ -124,15 +124,15 @@ def gui(queue, queue2):
     songLabel.setGeometry(25, 400, 400, 25)
     songLabel.setText("Wavelength")
     songLabel.setAlignment(QtCore.Qt.AlignCenter)
-    songLabel.setFont(QtGui.QFont("Comic Sans MS", 18, QtGui.QFont.Bold))
+    songLabel.setFont(QtGui.QFont("Comic Sans MS", 17, QtGui.QFont.Bold))
     #songLabel.move(125, 375)
 
     # make artist name under song title
     artistLabel = QtWidgets.QLabel(window)
-    artistLabel.setGeometry(25, 420, 400, 40)
+    artistLabel.setGeometry(25, 415, 400, 40)
     artistLabel.setText("Spack & Brandon P.")
     artistLabel.setAlignment(QtCore.Qt.AlignCenter)
-    artistLabel.setFont(QtGui.QFont("Comic Sans MS", 12))
+    artistLabel.setFont(QtGui.QFont("Comic Sans MS", 11))
     #artistLabel.move(125, 390)
 
 
