@@ -12,8 +12,9 @@ from tinytag import tinytag
 
 playlist = []
 currently_playing = []
+previous_songs = []
 
-def play_audio(queue, queue2):
+def play_audio(queue):
     # code for initializing and playing audio
     player = Playback()
     player.set_volume(1)
@@ -58,6 +59,8 @@ def play_audio(queue, queue2):
             else:
                 currently_playing.pop(0)
                 queue.put("play playlist")
+        elif message == "previous song":
+            pass
         elif message == "add to playlist":
             file = browse()
             playlist.append(file)
@@ -69,7 +72,7 @@ def play_audio(queue, queue2):
             player.stop()
             break
 
-def gui(queue, queue2):
+def gui(queue):
     app = QtWidgets.QApplication(sys.argv)
     window = QtWidgets.QMainWindow()
     window.setFixedSize(775, 500)
@@ -254,9 +257,8 @@ def update_end_time(trackLengthLabel, currently_playing):
 
 
 queue = Queue()
-queue2 = Queue()
-audio_thread = threading.Thread(target=play_audio, args=(queue, queue2))
-gui_thread = threading.Thread(target=gui, args=(queue, queue2))
+audio_thread = threading.Thread(target=play_audio, args=(queue,))
+gui_thread = threading.Thread(target=gui, args=(queue,))
 
 audio_thread.start()
 gui_thread.start()
