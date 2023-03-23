@@ -75,6 +75,8 @@ def gui(queue, queue2):
     window.setFixedSize(775, 500)
     window.setWindowTitle("Wavelength Audio Player")
     window.setWindowIcon(QtGui.QIcon("WavelengthIcon.png"))
+    #change background color to aqua blue
+    #window.setStyleSheet("background-color: #00FFFF;")
     window.setGeometry(100, 100, 775, 500)
 
     # make program name in corner
@@ -178,8 +180,7 @@ def gui(queue, queue2):
     timer.timeout.connect(lambda: update_song(songLabel, currently_playing))
     timer.timeout.connect(lambda: update_artist(artistLabel, currently_playing))
     timer.timeout.connect(lambda: update_art(albumArt, currently_playing))
-
-    timer.start(1000)
+    timer.start(100)
 
     #every 100ms, update the song name
     #timer2 = QtCore.QTimer()
@@ -219,19 +220,24 @@ def update_playlist(playlistWidget, playlist):
             playlistWidget.addItem(song_tag.title + " - " + song_tag.artist)
 
 def update_song(songLabel, currently_playing):
-    for song in currently_playing:
-        song_tag = tinytag.TinyTag.get(song)
+    if len(currently_playing) == 0:
+        pass
+    else:
+        song_tag = tinytag.TinyTag.get(currently_playing[0])
         songLabel.setText(song_tag.title)
 
 def update_artist(artistLabel, currently_playing):
-    for song in currently_playing:
-        song_tag = tinytag.TinyTag.get(song)
+    if len(currently_playing) == 0:
+        pass
+    else:
+        song_tag = tinytag.TinyTag.get(currently_playing[0])
         artistLabel.setText(song_tag.artist)
 
 def update_art(albumArt,  currently_playing):
-    for song in currently_playing:
-        song_tag = tinytag.TinyTag.get(song)
-
+    if len(currently_playing) == 0:
+        pass
+    else:
+        song_tag = tinytag.TinyTag.get(currently_playing[0])
         albumPixmap = QtGui.QPixmap()
         albumPixmap.loadFromData(song_tag.get_image())
         albumArt.setPixmap(albumPixmap)
