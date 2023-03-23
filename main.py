@@ -22,7 +22,9 @@ def play_audio(queue, queue2):
         if message == "play/pause":
             if player.playing:
                 player.pause()
-            else:
+            elif not player.active and not player.playing:
+                queue.put("play playlist")
+            elif not player.playing and player.active:
                 player.resume()
         elif message == "stop":
             player.stop()
@@ -138,7 +140,7 @@ def gui(queue, queue2):
     stopButton = QtWidgets.QPushButton("Stop", window)
     stopButton.clicked.connect(lambda: queue.put("stop"))
     # move the button below the play/pause button
-    stopButton.move(275, 0)
+    stopButton.move(175, 0)
 
     # Show current song location
     currintPosLabel = QtWidgets.QLabel(window)
@@ -166,12 +168,8 @@ def gui(queue, queue2):
     #control the volume of the player
     volBar.valueChanged.connect(lambda: queue.put("volume " + (volBar.value()).__str__()))
 
-    playPlaylistButton = QtWidgets.QPushButton("Play Playlist", window)
-    playPlaylistButton.clicked.connect(lambda: queue.put("play playlist"))
-    # move the button above the play/pause button
-    playPlaylistButton.move(175, 0)
     # code for the add to playlist button
-    addToPlaylistButton = QtWidgets.QPushButton("Add to Playlist", window)
+    addToPlaylistButton = QtWidgets.QPushButton("Browse", window)
     addToPlaylistButton.clicked.connect(lambda: queue.put("add to playlist"))
     addToPlaylistButton.move(75, 0)
 
