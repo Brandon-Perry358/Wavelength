@@ -103,67 +103,22 @@ def gui(queue):
     wavelengthLabel.setText("Wavelength")
     wavelengthLabel.move(10, 0)
 
-    albumArt = QtWidgets.QLabel(window)
-    albumPixmap = QtGui.QPixmap()
-    albumArt.setPixmap(QtGui.QPixmap("WavelengthArt.png"))
-    albumArt.setScaledContents(True)
-    albumArt.setGeometry(20, 40, 400, 360)
-
-    #make a list widget to display the playlist
-    playlistWidget = QtWidgets.QListWidget(window)
-    playlistWidget.setGeometry(500, 40, 250, 360)
-    #Display the contents of the playlist in the list widget
-        
-
-    # create button
-    skipBackButton = QtWidgets.QPushButton("", window)
-    skipBackButton.clicked.connect(lambda: queue.put("previous song"))
-    skipBackButton.move(20, 450)
-    skipBackButton.setGeometry(20, 450, 133, 35)
-    skipBackButton.setStyleSheet("background-image : url(skipBackButton.png); background-repeat : no-repeat; background-position : center;")
-    # code for function
-    # TODO
-
-    # code for creating the button
-    playPauseButton = QtWidgets.QPushButton("", window)
-    playPauseButton.clicked.connect(lambda: queue.put("play/pause"))
-    # move the button to the center of the window
-    playPauseButton.move(125, 450)
-    playPauseButton.setGeometry(153, 450, 134, 35)
-    #add image to playpause button and center it
-    playPauseButton.setStyleSheet("background-image : url(playPauseButton.png); background-repeat : no-repeat; background-position : center;")
-
-    # create button
-    skipForwardButton = QtWidgets.QPushButton("", window)
-    skipForwardButton.clicked.connect(lambda: queue.put("next song"))
-    skipForwardButton.move(225, 450)
-    skipForwardButton.setGeometry(287, 450, 133, 35)
-    skipForwardButton.setStyleSheet("background-image : url(skipForwardButton.png); background-repeat : no-repeat; background-position : center;")
-    # code for function
-    # TODO
-
-    # make song name under art
-    songLabel = QtWidgets.QLabel(window)
-    songLabel.setGeometry(25, 400, 400, 25)
-    songLabel.setText("Wavelength")
-    songLabel.setAlignment(QtCore.Qt.AlignCenter)
-    songLabel.setFont(QtGui.QFont("Comic Sans MS", 17, QtGui.QFont.Bold))
-    #songLabel.move(125, 375)
-
-    # make artist name under song title
-    artistLabel = QtWidgets.QLabel(window)
-    artistLabel.setGeometry(25, 415, 400, 40)
-    artistLabel.setText("Spack & Brandon P.")
-    artistLabel.setAlignment(QtCore.Qt.AlignCenter)
-    artistLabel.setFont(QtGui.QFont("Comic Sans MS", 11))
-    #artistLabel.move(125, 390)
-
+    # code for the add to playlist button
+    addToPlaylistButton = QtWidgets.QPushButton("Browse", window)
+    addToPlaylistButton.clicked.connect(lambda: queue.put("add to playlist"))
+    addToPlaylistButton.move(75, 0)
 
     # code for creating the stop button
     stopButton = QtWidgets.QPushButton("Stop", window)
     stopButton.clicked.connect(lambda: queue.put("stop"))
     # move the button below the play/pause button
     stopButton.move(175, 0)
+
+    albumArt = QtWidgets.QLabel(window)
+    albumPixmap = QtGui.QPixmap()
+    albumArt.setPixmap(QtGui.QPixmap("WavelengthArt.png"))
+    albumArt.setScaledContents(True)
+    albumArt.setGeometry(20, 40, 400, 360)
 
     # Show current song location
     currintPosLabel = QtWidgets.QLabel(window)
@@ -181,6 +136,48 @@ def gui(queue):
     trackLengthLabel.setGeometry(450, 375, 30, 30)
     trackLengthLabel.setText("1:34")
 
+    #make a list widget to display the playlist
+    playlistWidget = QtWidgets.QListWidget(window)
+    playlistWidget.setGeometry(500, 40, 250, 360)
+    #Display the contents of the playlist in the list widget
+
+    # make song name under art
+    songLabel = QtWidgets.QLabel(window)
+    songLabel.setGeometry(25, 400, 400, 25)
+    songLabel.setText("Wavelength")
+    songLabel.setAlignment(QtCore.Qt.AlignCenter)
+    songLabel.setFont(QtGui.QFont("Comic Sans MS", 17, QtGui.QFont.Bold))
+
+    # make artist name under song title
+    artistLabel = QtWidgets.QLabel(window)
+    artistLabel.setGeometry(25, 415, 400, 40)
+    artistLabel.setText("Spack & Brandon P.")
+    artistLabel.setAlignment(QtCore.Qt.AlignCenter)
+    artistLabel.setFont(QtGui.QFont("Comic Sans MS", 11))
+
+    # create button
+    skipBackButton = QtWidgets.QPushButton("", window)
+    skipBackButton.clicked.connect(lambda: queue.put("previous song"))
+    skipBackButton.move(20, 450)
+    skipBackButton.setGeometry(20, 450, 133, 35)
+    skipBackButton.setStyleSheet("background-image : url(skipBackButton.png); background-repeat : no-repeat; background-position : center;")
+
+    # code for creating the button
+    playPauseButton = QtWidgets.QPushButton("", window)
+    playPauseButton.clicked.connect(lambda: queue.put("play/pause"))
+    # move the button to the center of the window
+    playPauseButton.move(125, 450)
+    playPauseButton.setGeometry(153, 450, 134, 35)
+    #add image to playpause button and center it
+    playPauseButton.setStyleSheet("background-image : url(playPauseButton.png); background-repeat : no-repeat; background-position : center;")
+
+    # create button
+    skipForwardButton = QtWidgets.QPushButton("", window)
+    skipForwardButton.clicked.connect(lambda: queue.put("next song"))
+    skipForwardButton.move(225, 450)
+    skipForwardButton.setGeometry(287, 450, 133, 35)
+    skipForwardButton.setStyleSheet("background-image : url(skipForwardButton.png); background-repeat : no-repeat; background-position : center;")
+
     # make volume bar
     volBar = QtWidgets.QSlider(window)
     volBar.setOrientation(QtCore.Qt.Horizontal)
@@ -191,11 +188,6 @@ def gui(queue):
     #control the volume of the player
     volBar.valueChanged.connect(lambda: queue.put("volume " + (volBar.value()).__str__()))
 
-    # code for the add to playlist button
-    addToPlaylistButton = QtWidgets.QPushButton("Browse", window)
-    addToPlaylistButton.clicked.connect(lambda: queue.put("add to playlist"))
-    addToPlaylistButton.move(75, 0)
-
     timer = QtCore.QTimer()
     timer.timeout.connect(lambda: update_playlist(playlistWidget, playlist))
     timer.timeout.connect(lambda: update_song(songLabel, currently_playing))
@@ -204,15 +196,6 @@ def gui(queue):
     timer.timeout.connect(lambda: update_end_time(trackLengthLabel, currently_playing))
     timer.start(100)
 
-    #every 100ms, update the song name
-    #timer2 = QtCore.QTimer()
-    #timer2.timeout.connect(lambda: update_song_name(songLabel, artistLabel, queue))
-    #timer2.start(100)
-
-    #every 100ms, call the update_playback function
-    
-
-    #put a message in the queue to stop the thread when the window is closed
     window.destroyed.connect(lambda: queue.put("close"))
 
     window.show()
