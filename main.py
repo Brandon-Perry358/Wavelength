@@ -79,7 +79,10 @@ def play_audio(queue):
                 player.play()
         elif message == "add to playlist":
             file = browse()
-            playlist.append(file)
+            if file == None:
+                pass
+            else:
+                playlist.append(file)
         elif message.startswith("volume "):
             volume = int(message[7:])
             player.set_volume(volume / 100)
