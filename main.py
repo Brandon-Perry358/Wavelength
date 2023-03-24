@@ -18,7 +18,7 @@ temp_playlist = []
 def play_audio(queue):
     # code for initializing and playing audio
     player = Playback()
-    player.set_volume(1)
+    player.set_volume(0.5)
     while True:
         message = queue.get()
         if message == "play/pause":
@@ -79,7 +79,10 @@ def play_audio(queue):
                 player.play()
         elif message == "add to playlist":
             file = browse()
-            playlist.append(file)
+            if file == None:
+                pass
+            else:
+                playlist.append(file)
         elif message.startswith("volume "):
             volume = int(message[7:])
             player.set_volume(volume / 100)
@@ -146,14 +149,14 @@ def gui(queue):
     songLabel.setGeometry(25, 400, 400, 25)
     songLabel.setText("Wavelength")
     songLabel.setAlignment(QtCore.Qt.AlignCenter)
-    songLabel.setFont(QtGui.QFont("Comic Sans MS", 17, QtGui.QFont.Bold))
+    songLabel.setFont(QtGui.QFont("Helvetica", 17, QtGui.QFont.Bold))
 
     # make artist name under song title
     artistLabel = QtWidgets.QLabel(window)
     artistLabel.setGeometry(25, 415, 400, 40)
     artistLabel.setText("Spack & Brandon P.")
     artistLabel.setAlignment(QtCore.Qt.AlignCenter)
-    artistLabel.setFont(QtGui.QFont("Comic Sans MS", 11))
+    artistLabel.setFont(QtGui.QFont("Helvetica", 11))
 
     # create button
     skipBackButton = QtWidgets.QPushButton("", window)
@@ -184,7 +187,7 @@ def gui(queue):
     volBar.setGeometry(450, 450, 300, 35)
     volBar.setInvertedAppearance(False)
     volBar.setRange(0, 100)
-    volBar.setValue(100)
+    volBar.setValue(50)
     #control the volume of the player
     volBar.valueChanged.connect(lambda: queue.put("volume " + (volBar.value()).__str__()))
 
@@ -222,21 +225,34 @@ def update_playlist(playlistWidget, playlist):
             pass
         else:
             song_tag = tinytag.TinyTag.get(song)
-            playlistWidget.addItem(song_tag.title + " - " + song_tag.artist)
+            if song_tag.title == None and song_tag.artist == None:
+                playlistWidget.addItem("Unknown Title - Unknown Artist")
+            elif song_tag.title == None:
+                playlistWidget.addItem("Unknown Title - " + song_tag.artist)
+            elif song_tag.artist == None:
+                playlistWidget.addItem(song_tag.title + " - Unknown Artist")
+            else:
+                playlistWidget.addItem(song_tag.title + " - " + song_tag.artist)
 
 def update_song(songLabel, currently_playing):
     if len(currently_playing) == 0:
         pass
     else:
         song_tag = tinytag.TinyTag.get(currently_playing[0])
-        songLabel.setText(song_tag.title)
+        if song_tag.title == None:
+            songLabel.setText("Unknown Title")
+        else:
+            songLabel.setText(song_tag.title)
 
 def update_artist(artistLabel, currently_playing):
     if len(currently_playing) == 0:
         pass
     else:
         song_tag = tinytag.TinyTag.get(currently_playing[0])
-        artistLabel.setText(song_tag.artist)
+        if song_tag.artist == None:
+            artistLabel.setText("Unknown Artist")
+        else:
+            artistLabel.setText(song_tag.artist)
 
 def update_art(albumArt, albumPixmap,  currently_playing):
     if len(currently_playing) == 0:
@@ -244,7 +260,10 @@ def update_art(albumArt, albumPixmap,  currently_playing):
     else:
         song_tag = tinytag.TinyTag.get(currently_playing[0], image=True)
         albumPixmap.loadFromData(song_tag.get_image())
-        albumArt.setPixmap(albumPixmap)
+        if albumPixmap.isNull():
+            albumArt.setPixmap(QtGui.QPixmap("WavelengthArt.png"))
+        else:
+            albumArt.setPixmap(albumPixmap)
 
 def update_end_time(trackLengthLabel, currently_playing):
     if len(currently_playing) == 0:
@@ -254,7 +273,6 @@ def update_end_time(trackLengthLabel, currently_playing):
         min = int(song_tag.duration % 3600 / 60)
         sec = int(song_tag.duration % 3600 % 60)
         trackLengthLabel.setText(str(min) + ":" + str(sec))
-
 
 queue = Queue()
 audio_thread = threading.Thread(target=play_audio, args=(queue,))
