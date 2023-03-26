@@ -114,21 +114,24 @@ def gui(queue):
     wavelengthLabel.setText("Wavelength")
     #set text color to red
     wavelengthLabel.setStyleSheet("color: #39ff14;")
+    wavelengthLabel.setFont(QtGui.QFont("Helvetica", 10, QtGui.QFont.Bold))
     wavelengthLabel.move(10, 0)
 
     # code for the add to playlist button
     addToPlaylistButton = QtWidgets.QPushButton("Browse", window)
     #set the color of the button to red
     addToPlaylistButton.setStyleSheet("background-color: #39ff14;")
+    addToPlaylistButton.setFont(QtGui.QFont("Helvetica", 10, QtGui.QFont.Bold))
     addToPlaylistButton.clicked.connect(lambda: queue.put("add to playlist"))
-    addToPlaylistButton.move(75, 0)
+    addToPlaylistButton.move(100, 0)
 
     # code for creating the stop button
     stopButton = QtWidgets.QPushButton("Stop", window)
     stopButton.clicked.connect(lambda: queue.put("stop"))
+    stopButton.setFont(QtGui.QFont("Helvetica", 10, QtGui.QFont.Bold))
     # set the color of the button to red
     stopButton.setStyleSheet("background-color: #39ff14;")
-    stopButton.move(175, 0)
+    stopButton.move(200, 0)
 
     albumArt = QtWidgets.QLabel(window)
     albumPixmap = QtGui.QPixmap()
@@ -166,6 +169,13 @@ def gui(queue):
     playlistWidget.setGeometry(500, 40, 250, 360)
     #set the color of the widget to white
     playlistWidget.setStyleSheet("background-color: white;")
+    # make a label for the playlist widget above the top left corner
+    playlistLabel = QtWidgets.QLabel(window)
+    playlistLabel.setGeometry(500, 9, 250, 40)
+    playlistLabel.setText("Playing Next:")
+    # set the color of the label to neon green
+    playlistLabel.setStyleSheet("background-color: transparent;" + "color: #39ff14;")
+    playlistLabel.setFont(QtGui.QFont("Helvetica", 10, QtGui.QFont.Bold))
 
     # make song name under art
     songLabel = QtWidgets.QLabel(window)
@@ -231,6 +241,13 @@ def gui(queue):
     volBar.valueChanged.connect(lambda: queue.put("volume " + (volBar.value()).__str__()))
     #set the color of the slider bar to neon green
     volBar.setStyleSheet("QSlider::groove:horizontal {border: 1px solid #bbb; background: white; height: 10px; border-radius: 4px;}" + "QSlider::sub-page:horizontal {background: #39ff14; border: 1px solid #777; height: 10px; border-radius: 4px;}" + "QSlider::add-page:horizontal {background: #fff; border: 1px solid #777; height: 10px; border-radius: 4px;}" + "QSlider::handle:horizontal {background: #39ff14; border: 1px solid #777; width: 13px; margin-top: -2px; margin-bottom: -2px; border-radius: 4px;}" + "QSlider::handle:horizontal:hover {background: #39ff14; border: 1px solid #444; width: 13px; margin-top: -2px; margin-bottom: -2px; border-radius: 4px;}" + "QSlider::sub-page:horizontal:disabled {background: #bbb; border-color: #999;}" + "QSlider::add-page:horizontal:disabled {background: #eee; border-color: #999;}" + "QSlider::handle:horizontal:disabled {background: #eee; border: 1px solid #aaa; border-radius: 4px;}")
+    #make a lablel for the volume bar above the top left corner
+    volLabel = QtWidgets.QLabel(window)
+    volLabel.setGeometry(450, 430, 300, 25)
+    volLabel.setText("Volume")
+    #set the color of the label to neon green
+    volLabel.setStyleSheet("background-color: transparent;" + "color: #39ff14")
+    volLabel.setFont(QtGui.QFont("Helvetica", 11, QtGui.QFont.Bold))
 
     timer = QtCore.QTimer()
     timer.timeout.connect(lambda: update_playlist(playlistWidget, playlist))
