@@ -197,7 +197,7 @@ def gui(queue):
     timer.timeout.connect(lambda: update_artist(artistLabel, currently_playing))
     timer.timeout.connect(lambda: update_art(albumArt, albumPixmap, currently_playing))
     timer.timeout.connect(lambda: update_end_time(trackLengthLabel, currently_playing))
-    timer.start(100)
+    timer.start(500)
 
     window.destroyed.connect(lambda: queue.put("close"))
 
@@ -236,7 +236,8 @@ def update_playlist(playlistWidget, playlist):
 
 def update_song(songLabel, currently_playing):
     if len(currently_playing) == 0:
-        pass
+        songLabel.setText("Wavelength")
+        #pass
     else:
         song_tag = tinytag.TinyTag.get(currently_playing[0])
         if song_tag.title == None:
@@ -246,7 +247,8 @@ def update_song(songLabel, currently_playing):
 
 def update_artist(artistLabel, currently_playing):
     if len(currently_playing) == 0:
-        pass
+        artistLabel.setText("Spack & Brandon P.")
+        #pass
     else:
         song_tag = tinytag.TinyTag.get(currently_playing[0])
         if song_tag.artist == None:
@@ -256,7 +258,8 @@ def update_artist(artistLabel, currently_playing):
 
 def update_art(albumArt, albumPixmap,  currently_playing):
     if len(currently_playing) == 0:
-        pass
+        albumArt.setPixmap(QtGui.QPixmap("WavelengthArt.png"))
+        #pass
     else:
         song_tag = tinytag.TinyTag.get(currently_playing[0], image=True)
         albumPixmap.loadFromData(song_tag.get_image())
