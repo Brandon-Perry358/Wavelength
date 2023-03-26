@@ -43,6 +43,7 @@ def play_audio(queue):
                 playlist.pop(0)
                 #play the song
                 player.load_file(currently_playing[0])
+                time.sleep(0.25)
                 player.play()
             if not player.active:
                 #if playlist is empty, do nothing
@@ -84,6 +85,7 @@ def play_audio(queue):
                 playlist.insert(0, temp_playlist[0])
                 temp_playlist.pop(0)
                 player.load_file(currently_playing[0])
+                time.sleep(0.25)
                 player.play()
         elif message == "add to playlist":
             file = browse()
