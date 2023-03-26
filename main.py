@@ -34,6 +34,8 @@ def play_audio(queue):
             player.stop()
             playlist.clear()
             currently_playing.clear()
+            previous_songs.clear()
+            temp_playlist.clear()
         elif message == "play playlist":
             if player.active:
                 player.stop()
@@ -73,7 +75,7 @@ def play_audio(queue):
                 currently_playing.clear()
                 queue.put("play playlist")
         elif message == "previous song":
-            if len(previous_songs) == 0:
+            if len(previous_songs) <= 0:
                 pass
             else:
                 player.stop()
