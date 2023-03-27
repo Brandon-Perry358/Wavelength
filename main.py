@@ -24,6 +24,7 @@ def play_audio(queue):
         if message == "play/pause":
             if player.playing:
                 player.pause()
+                print("Time left in song: " + str(int(player.duration) - int(player.curr_pos)))
             elif not player.active and not player.playing:
                 queue.put("play playlist")
             elif not player.playing and player.active:
@@ -99,6 +100,9 @@ def play_audio(queue):
             volume = int(message[7:])
             player.set_volume(volume / 100)
             print("Volume is: " + (volume).__str__())
+        elif message.startswith("seek "):
+            seek = int(message[5:])
+            player.seek(seek * player.duration / 100)
         elif message == "close":
             player.stop()
             break
@@ -157,6 +161,11 @@ def gui(queue):
     seekBar.setOrientation(QtCore.Qt.Vertical)
     seekBar.setGeometry(450, 75, 25, 300)
     seekBar.setInvertedAppearance(True)
+    seekBar.setRange(0, 100)
+    #seekBar.setSliderPosition(20)
+    #print the current bar value to the console
+    print(seekBar.value())
+    seekBar.valueChanged.connect(lambda: queue.put("seek " + (seekBar.value()).__str__()))
     #Set the color of the seek bar handle to green and show past progress as green in the bar
     seekBar.setStyleSheet("QSlider::handle:vertical {background-color: #39ff14;}")
     #seekBar.valueChanged.connect(lambda: queue.put("seek " + (seekBar.value()).__str__()))
@@ -259,6 +268,7 @@ def gui(queue):
     timer.timeout.connect(lambda: update_artist(artistLabel, currently_playing))
     timer.timeout.connect(lambda: update_art(albumArt, albumPixmap, currently_playing))
     timer.timeout.connect(lambda: update_end_time(trackLengthLabel, currently_playing))
+    timer.timeout.connect(lambda: update_current_time(seekBar.value(), currintPosLabel, currently_playing))
     timer.start(500)
 
     window.destroyed.connect(lambda: queue.put("close"))
@@ -341,6 +351,19 @@ def update_end_time(trackLengthLabel, currently_playing):
             trackLengthLabel.setText(str(min) + ":0" + str(sec))
         else:
             trackLengthLabel.setText(str(min) + ":" + str(sec))
+
+def update_current_time(seekBar, currintPosLabel, currently_playing):
+    if len(currently_playing) == 0:
+        currintPosLabel.setText("0:00")
+    else:
+        song_tag = tinytag.TinyTag.get(currently_playing[0])
+        new_time = song_tag.duration * seekBar / 100
+        min = int(new_time % 3600 / 60)
+        sec = int(new_time % 3600 % 60)
+        if sec < 10:
+            currintPosLabel.setText(str(min) + ":0" + str(sec))
+        else:
+            currintPosLabel.setText(str(min) + ":" + str(sec))
 
 queue = Queue()
 audio_thread = threading.Thread(target=play_audio, args=(queue,))
