@@ -15,9 +15,83 @@ currently_playing = []
 previous_songs = []
 temp_playlist = []
 
+global layoutNew
+
+newCurrintPosX = 450
+newCurrintPosY = 50
+newCurrintPosH = 30
+newCurrintPosW = 30
+
+newSeekBarX = 450
+newSeekBarY = 75
+newSeekBarH = 25
+newSeekBarW = 300
+
+newTrackLengthX = 450
+newTrackLengthY = 375
+newTrackLengthH = 30
+newTrackLengthW = 30
+
+newPlaylistX = 500
+newPlaylistY = 40
+newPlaylistH = 250
+newPlaylistW = 360
+
+newPlaylistLabelX = 500
+newPlaylistLabelY = 9
+newPlaylistLabelH = 250
+newPlaylistLabelW = 40
+
+newVolBarX = 450
+newVolBarY = 450
+newVolBarH = 300
+newVolBarW = 35
+
+newVolLabelX = 450
+newVolLabelY = 430
+newVolLabelH = 300
+newVolLabelW = 25
+
+tradCurrintPosX = 425
+tradCurrintPosY = 448
+tradCurrintPosH = 30
+tradCurrintPosW = 30
+
+tradSeekBarX = 450
+tradSeekBarY = 450
+tradSeekBarH = 275
+tradSeekBarW = 25
+
+tradTrackLengthX = 735
+tradTrackLengthY = 448
+tradTrackLengthH = 30
+tradTrackLengthW = 30
+
+tradPlaylistX = 450
+tradPlaylistY = 40
+tradPlaylistH = 250
+tradPlaylistW = 360
+
+tradPlaylistLabelX = 450
+tradPlaylistLabelY = 9
+tradPlaylistLabelH = 250
+tradPlaylistLabelW = 40
+
+tradVolBarX = 720
+tradVolBarY = 40
+tradVolBarH = 35
+tradVolBarW = 355
+
+tradVolLabelX = 710
+tradVolLabelY = 10
+tradVolLabelH = 300
+tradVolLabelW = 25
+
+
 def play_audio(queue):
     # code for initializing and playing audio
     player = Playback()
+
     player.set_volume(0.5)
     while True:
         message = queue.get()
@@ -103,11 +177,15 @@ def play_audio(queue):
         elif message.startswith("seek "):
             seek = int(message[5:])
             player.seek(seek * player.duration / 100)
+            print(seek)
         elif message == "close":
             player.stop()
             break
 
+
 def gui(queue):
+    global layoutNew
+    layoutNew = True
     app = QtWidgets.QApplication(sys.argv)
     window = QtWidgets.QMainWindow()
     window.setFixedSize(775, 500)
@@ -140,6 +218,13 @@ def gui(queue):
     # set the color of the button to red
     stopButton.setStyleSheet("background-color: #39ff14;")
     stopButton.move(200, 0)
+
+    layoutSwap = QtWidgets.QPushButton("Swap Layout", window)
+    layoutSwap.clicked.connect(lambda: wrapper(currintPosLabel, seekBar, trackLengthLabel, playlistWidget, playlistLabel, volBar, volLabel))
+    layoutSwap.setFont(QtGui.QFont("Helvetica", 10, QtGui.QFont.Bold))
+    # set the color of the button to red
+    layoutSwap.setStyleSheet("background-color: #39ff14;")
+    layoutSwap.move(300, 0)
 
     albumArt = QtWidgets.QLabel(window)
     albumPixmap = QtGui.QPixmap()
@@ -272,10 +357,43 @@ def gui(queue):
     timer.start(500)
 
     window.destroyed.connect(lambda: queue.put("close"))
-
     window.show()
     sys.exit(app.exec_())
-    
+
+def wrapper(currintPosLabel, seekBar, trackLengthLabel, playlistWidget, playlistLabel, volBar, volLabel):
+    global layoutNew
+    if(layoutNew):
+        currintPosLabel.setGeometry(tradCurrintPosX, tradCurrintPosY, tradCurrintPosH, tradCurrintPosW)
+        seekBar.setGeometry(tradSeekBarX, tradSeekBarY, tradSeekBarH, tradSeekBarW)
+        seekBar.setOrientation(QtCore.Qt.Horizontal)
+        seekBar.setInvertedAppearance(False)
+        trackLengthLabel.setGeometry(tradTrackLengthX, tradTrackLengthY, tradTrackLengthH, tradTrackLengthW)
+        playlistWidget.setGeometry(tradPlaylistX, tradPlaylistY, tradPlaylistH, tradPlaylistW)
+        playlistLabel.setGeometry(tradPlaylistLabelX, tradPlaylistLabelY, tradPlaylistLabelH, tradPlaylistLabelW)
+        volBar.setGeometry(tradVolBarX, tradVolBarY, tradVolBarH, tradVolBarW)
+        volBar.setOrientation(QtCore.Qt.Vertical)
+        volBar.setStyleSheet(
+            "QSlider::groove:vertical {border: 1px solid #bbb; background: white; width: 10px; border-radius: 4px;}" + "QSlider::sub-page:vertical {background: #fff; border: 1px solid #777; width: 10px; border-radius: 4px;}" + "QSlider::add-page:vertical {background: #39ff14; border: 1px solid #777; width: 10px; border-radius: 4px;}" + "QSlider::handle:vertical {background: #39ff14; border: 1px solid #777; height: 13px; margin-left: -2px; margin-right: -2px; border-radius: 4px;}" + "QSlider::handle:vertical:hover {background: #39ff14; border: 1px solid #444; height: 13px; margin-left: -2px; margin-right: -2px; border-radius: 4px;}" + "QSlider::sub-page:vertical:disabled {background: #bbb; border-color: #999;}" + "QSlider::add-page:vertical:disabled {background: #eee; border-color: #999;}" + "QSlider::handle:vertical:disabled {background: #eee; border: 1px solid #aaa; border-radius: 4px;}")
+        volLabel.setGeometry(tradVolLabelX, tradVolLabelY, tradVolLabelH, tradVolLabelW)
+        seekBar.setStyleSheet("QSlider::handle:horizontal {background-color: #39ff14;}")
+        layoutNew = False
+    else:
+        currintPosLabel.setGeometry(newCurrintPosX, newCurrintPosY, newCurrintPosH, newCurrintPosW)
+        seekBar.setGeometry(newSeekBarX, newSeekBarY, newSeekBarH, newSeekBarW)
+        seekBar.setOrientation(QtCore.Qt.Vertical)
+        seekBar.setInvertedAppearance(True)
+        seekBar.setStyleSheet("QSlider::handle:vertical {background-color: #39ff14;}")
+        trackLengthLabel.setGeometry(newTrackLengthX, newTrackLengthY, newTrackLengthH, newTrackLengthW)
+        playlistWidget.setGeometry(newPlaylistX, newPlaylistY, newPlaylistH, newPlaylistW)
+        playlistLabel.setGeometry(newPlaylistLabelX, newPlaylistLabelY, newPlaylistLabelH, newPlaylistLabelW)
+        volBar.setGeometry(newVolBarX, newVolBarY, newVolBarH, newVolBarW)
+        volBar.setStyleSheet(
+            "QSlider::groove:horizontal {border: 1px solid #bbb; background: white; height: 10px; border-radius: 4px;}" + "QSlider::sub-page:horizontal {background: #39ff14; border: 1px solid #777; height: 10px; border-radius: 4px;}" + "QSlider::add-page:horizontal {background: #fff; border: 1px solid #777; height: 10px; border-radius: 4px;}" + "QSlider::handle:horizontal {background: #39ff14; border: 1px solid #777; width: 13px; margin-top: -2px; margin-bottom: -2px; border-radius: 4px;}" + "QSlider::handle:horizontal:hover {background: #39ff14; border: 1px solid #444; width: 13px; margin-top: -2px; margin-bottom: -2px; border-radius: 4px;}" + "QSlider::sub-page:horizontal:disabled {background: #bbb; border-color: #999;}" + "QSlider::add-page:horizontal:disabled {background: #eee; border-color: #999;}" + "QSlider::handle:horizontal:disabled {background: #eee; border: 1px solid #aaa; border-radius: 4px;}")
+        volBar.setOrientation(QtCore.Qt.Horizontal)
+        volLabel.setGeometry(newVolLabelX, newVolLabelY, newVolLabelH, newVolLabelW)
+        layoutNew = True
+
+
 
 def browse():
     app = QApplication(sys.argv)
@@ -368,6 +486,8 @@ def update_current_time(seekBar, currintPosLabel, currently_playing):
 queue = Queue()
 audio_thread = threading.Thread(target=play_audio, args=(queue,))
 gui_thread = threading.Thread(target=gui, args=(queue,))
+
+
 
 audio_thread.start()
 gui_thread.start()
