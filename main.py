@@ -196,12 +196,12 @@ def gui(queue):
     window.setGeometry(100, 100, 775, 500)
 
     # make program name in corner
-    wavelengthLabel = QtWidgets.QLabel(window)
-    wavelengthLabel.setText("Wavelength")
-    #set text color to red
-    wavelengthLabel.setStyleSheet("color: #39ff14;")
-    wavelengthLabel.setFont(QtGui.QFont("Helvetica", 10, QtGui.QFont.Bold))
-    wavelengthLabel.move(10, 0)
+    # wavelengthLabel = QtWidgets.QLabel(window)
+    # wavelengthLabel.setText("Wavelength")
+    # #set text color to red
+    # wavelengthLabel.setStyleSheet("color: #39ff14;")
+    # wavelengthLabel.setFont(QtGui.QFont("Helvetica", 10, QtGui.QFont.Bold))
+    # wavelengthLabel.move(10, 0)
 
     # code for the add to playlist button
     addToPlaylistButton = QtWidgets.QPushButton("Browse", window)
@@ -209,7 +209,7 @@ def gui(queue):
     addToPlaylistButton.setStyleSheet("background-color: #39ff14;")
     addToPlaylistButton.setFont(QtGui.QFont("Helvetica", 10, QtGui.QFont.Bold))
     addToPlaylistButton.clicked.connect(lambda: queue.put("add to playlist"))
-    addToPlaylistButton.move(100, 0)
+    addToPlaylistButton.move(0, 0)
 
     # code for creating the stop button
     stopButton = QtWidgets.QPushButton("Stop", window)
@@ -217,14 +217,18 @@ def gui(queue):
     stopButton.setFont(QtGui.QFont("Helvetica", 10, QtGui.QFont.Bold))
     # set the color of the button to red
     stopButton.setStyleSheet("background-color: #39ff14;")
-    stopButton.move(200, 0)
+    stopButton.move(100, 0)
 
     layoutSwap = QtWidgets.QPushButton("Swap Layout", window)
     layoutSwap.clicked.connect(lambda: wrapper(currintPosLabel, seekBar, trackLengthLabel, playlistWidget, playlistLabel, volBar, volLabel))
     layoutSwap.setFont(QtGui.QFont("Helvetica", 10, QtGui.QFont.Bold))
-    # set the color of the button to red
     layoutSwap.setStyleSheet("background-color: #39ff14;")
-    layoutSwap.move(300, 0)
+    layoutSwap.move(200, 0)
+
+    optionsButton = QtWidgets.QPushButton("Options", window)
+    optionsButton.setFont(QtGui.QFont("Helvetica", 10, QtGui.QFont.Bold))
+    optionsButton.setStyleSheet("background-color: #39ff14;")
+    optionsButton.move(300, 0)
 
     albumArt = QtWidgets.QLabel(window)
     albumPixmap = QtGui.QPixmap()
