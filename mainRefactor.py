@@ -23,7 +23,9 @@ def play_audio(queue, mainWindow):
         message = queue.get()
         if message == "play/pause":
             if player.playing:
+                currTime = player.curr_pos
                 player.pause()
+                mainWindow.seekBar.setValue(int(currTime))
                 # print("Time left in song: " + str(int(player.duration) - int(player.curr_pos)))
             elif not player.active and not player.playing:
                 queue.put("play playlist")
