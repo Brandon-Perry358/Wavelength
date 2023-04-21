@@ -21,7 +21,6 @@ def play_audio(queue, mainWindow):
 
     while True:
         message = queue.get()
-        print(message)
         if message == "play/pause":
             if player.playing:
                 currTime = player.curr_pos
