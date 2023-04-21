@@ -16,7 +16,7 @@ def play_audio(queue, mainWindow):
     player = Playback()
     player.set_volume(0.5)
 
-    update_thread = threading.Thread(target=updateSongPos, args=(window, player))
+    update_thread = threading.Thread(target=updateSongPos, args=(mainWindow, player))
     update_thread.start()
 
     while True:
@@ -24,7 +24,7 @@ def play_audio(queue, mainWindow):
         if message == "play/pause":
             if player.playing:
                 player.pause()
-                print("Time left in song: " + str(int(player.duration) - int(player.curr_pos)))
+                # print("Time left in song: " + str(int(player.duration) - int(player.curr_pos)))
             elif not player.active and not player.playing:
                 queue.put("play playlist")
             elif not player.playing and player.active:
@@ -48,7 +48,12 @@ def play_audio(queue, mainWindow):
                 player.load_file(mainWindow.currently_playing[0])
                 time.sleep(0.2)
                 # print("Player duration: " + str(player.duration))
-                window.seekBar.setRange(0, int(player.duration ))
+                window.seekBar.setRange(0, int(player.duration))
+                mainWindow.update_song()
+                mainWindow.update_artist()
+                mainWindow.update_art()
+                mainWindow.update_end_time()
+                mainWindow.update_playlist()
                 player.play()
             if not player.active:
                 # if playlist is empty, do nothing
@@ -63,6 +68,11 @@ def play_audio(queue, mainWindow):
                     player.load_file(mainWindow.currently_playing[0])
                     # print("Player duration: " + str(player.duration))
                     window.seekBar.setRange(0, int(player.duration))
+                    mainWindow.update_song()
+                    mainWindow.update_artist()
+                    mainWindow.update_art()
+                    mainWindow.update_end_time()
+                    mainWindow.update_playlist()
                     player.play()
                 else:
                     pass
@@ -93,6 +103,11 @@ def play_audio(queue, mainWindow):
                 mainWindow.temp_playlist.pop(0)
                 player.load_file(mainWindow.currently_playing[0])
                 time.sleep(0.2)
+                mainWindow.update_song()
+                mainWindow.update_artist()
+                mainWindow.update_art()
+                mainWindow.update_end_time()
+                mainWindow.update_playlist()
                 player.play()
         elif message == "add to playlist":
             file = window.browse()
@@ -100,6 +115,7 @@ def play_audio(queue, mainWindow):
                 pass
             else:
                 mainWindow.playlist.append(file)
+                mainWindow.update_playlist()
         elif message.startswith("volume "):
             volume = int(message[7:])
             player.set_volume(volume / 100)
@@ -111,6 +127,12 @@ def play_audio(queue, mainWindow):
         elif message == "close":
             player.stop()
             break
+        if (player.curr_pos == 0):
+            mainWindow.update_song()
+            mainWindow.update_artist()
+            mainWindow.update_art()
+            mainWindow.update_end_time()
+            mainWindow.update_playlist()
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -342,14 +364,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.popup = QtWidgets.QMessageBox()
         self.popup.setText("Options")
 
-        self.timer = QtCore.QTimer()
-        self.timer.timeout.connect(self.update_playlist)
-        self.timer.timeout.connect(self.update_song)
-        self.timer.timeout.connect(self.update_artist)
-        self.timer.timeout.connect(self.update_art)
-        self.timer.timeout.connect(self.update_end_time)
-        #self.timer.timeout.connect(self.update_current_time)
-        self.timer.start(1000)
+        #self.timer = QtCore.QTimer()
+        # self.timer.timeout.connect(self.update_playlist)
+        # self.timer.timeout.connect(self.update_song)
+        # self.timer.timeout.connect(self.update_artist)
+        # self.timer.timeout.connect(self.update_art)
+        # self.timer.timeout.connect(self.update_end_time)
+        #self.timer.start(500)
 
         self.destroyed.connect(lambda: queue.put("close"))
 
@@ -417,19 +438,6 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 self.albumArt.setPixmap(self.albumPixmap)
 
-    def update_current_time(self):
-        if len(self.currently_playing) == 0:
-            self.currintPosLabel.setText("0:00")
-        else:
-            song_tag = tinytag.TinyTag.get(self.currently_playing[0])
-            new_time = song_tag.duration * self.seekBar / 100
-            min = int(new_time % 3600 / 60)
-            sec = int(new_time % 3600 % 60)
-            if sec < 10:
-                self.currintPosLabel.setText(str(min) + ":0" + str(sec))
-            else:
-                self.currintPosLabel.setText(str(min) + ":" + str(sec))
-
     def update_end_time(self):
         if len(self.currently_playing) == 0:
             self.trackLengthLabel.setText("0:00")
@@ -477,7 +485,6 @@ class MainWindow(QtWidgets.QMainWindow):
             self.layoutNew = True
 
 def updateSongPos(window, player):
-    print("HERE")
     while True:
         if player.playing:
             min = int(player.curr_pos % 3600 / 60)
@@ -488,7 +495,10 @@ def updateSongPos(window, player):
                 window.currintPosLabel.setText(str(min) + ":" + str(sec))
 
             currentSeekPlace = getSeekPos(player)
-            window.seekBar.setValue(int((currentSeekPlace)))
+            if not window.seekBar.isSliderDown():
+                window.seekBar.setValue(int((currentSeekPlace)))
+            else:
+                pass
 
 
 def getSeekPos(player):
