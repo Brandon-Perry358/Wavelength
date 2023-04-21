@@ -21,11 +21,18 @@ def play_audio(queue, mainWindow):
 
     while True:
         message = queue.get()
+        print(message)
         if message == "play/pause":
             if player.playing:
                 currTime = player.curr_pos
                 player.pause()
                 mainWindow.seekBar.setValue(int(currTime))
+                min = int(player.curr_pos % 3600 / 60)
+                sec = int(player.curr_pos % 3600 % 60)
+                if sec < 10:
+                    mainWindow.currintPosLabel.setText(str(min) + ":0" + str(sec))
+                else:
+                    mainWindow.currintPosLabel.setText(str(min) + ":" + str(sec))
                 # print("Time left in song: " + str(int(player.duration) - int(player.curr_pos)))
             elif not player.active and not player.playing:
                 queue.put("play playlist")
@@ -41,7 +48,7 @@ def play_audio(queue, mainWindow):
             mainWindow.temp_playlist.clear()
         elif message == "play playlist":
             if player.active:
-                player.stop()
+                #player.stop()
                 # read the playlist and place the first song in the currently_playing list
                 mainWindow.currently_playing.append(mainWindow.playlist[0])
                 # remove the first song from the playlist
@@ -51,6 +58,7 @@ def play_audio(queue, mainWindow):
                 time.sleep(0.2)
                 # print("Player duration: " + str(player.duration))
                 window.seekBar.setRange(0, int(player.duration))
+                # mainWindow.seekBar.setValue(0)
                 mainWindow.update_song()
                 mainWindow.update_artist()
                 mainWindow.update_art()
@@ -69,7 +77,7 @@ def play_audio(queue, mainWindow):
                     # play the song
                     player.load_file(mainWindow.currently_playing[0])
                     # print("Player duration: " + str(player.duration))
-                    window.seekBar.setRange(0, int(player.duration))
+                    mainWindow.seekBar.setRange(0, int(player.duration))
                     mainWindow.update_song()
                     mainWindow.update_artist()
                     mainWindow.update_art()
@@ -90,6 +98,8 @@ def play_audio(queue, mainWindow):
             else:
                 mainWindow.previous_songs.insert(0, mainWindow.currently_playing[0])
                 mainWindow.currently_playing.clear()
+                #DONT REMOVE SEEK
+                mainWindow.seekBar.setValue(0)
                 queue.put("play playlist")
         elif message == "previous song":
             if len(mainWindow.previous_songs) <= 0:
@@ -104,6 +114,7 @@ def play_audio(queue, mainWindow):
                 mainWindow.playlist.insert(0, mainWindow.temp_playlist[0])
                 mainWindow.temp_playlist.pop(0)
                 player.load_file(mainWindow.currently_playing[0])
+                mainWindow.seekBar.setRange(0, int(player.duration))
                 time.sleep(0.2)
                 mainWindow.update_song()
                 mainWindow.update_artist()
@@ -139,6 +150,9 @@ def play_audio(queue, mainWindow):
             mainWindow.addToPlaylistButton.setEnabled(False)
         if not player.playing:
             mainWindow.addToPlaylistButton.setEnabled(True)
+
+        if player.curr_pos >= int(player.duration) and mainWindow.seekBar.value() >= int(player.duration):
+            queue.put("next song")
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -494,7 +508,7 @@ def updateSongPos(window, player):
                 window.currintPosLabel.setText(str(min) + ":" + str(sec))
 
             currentSeekPlace = getSeekPos(player)
-            if not window.seekBar.isSliderDown():
+            if not window.seekBar.isSliderDown() and window.seekBar.value() > 0:
                 window.seekBar.setValue(int((currentSeekPlace)))
             else:
                 pass
