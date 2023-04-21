@@ -235,6 +235,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tradVolLabelH = 300
         self.tradVolLabelW = 25
 
+        self.popup = QtWidgets.QMessageBox()
+        self.popup.setText("Options")
+
         self.layoutNew = True
 
         self.setFixedSize(QtCore.QSize(775, 500))
@@ -266,7 +269,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.optionsButton = QtWidgets.QPushButton("Options", self)
         self.optionsButton.setFont(QtGui.QFont("Helvetica", 10, QtGui.QFont.Bold))
         self.optionsButton.setStyleSheet("background-color: #39ff14;")
-        # optionsButton.clicked.connect(lambda: showPopup(popup))
+        self.optionsButton.clicked.connect(self.popup.show)
         self.optionsButton.move(300, 0)
 
         self.albumArt = QtWidgets.QLabel(self)
@@ -381,8 +384,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.volLabel.setStyleSheet("background-color: transparent;" + "color: #39ff14")
         self.volLabel.setFont(QtGui.QFont("Helvetica", 11, QtGui.QFont.Bold))
 
-        self.popup = QtWidgets.QMessageBox()
-        self.popup.setText("Options")
+
 
 
         self.destroyed.connect(lambda: queue.put("close"))
@@ -508,7 +510,7 @@ def updateSongPos(window, player):
                 window.currintPosLabel.setText(str(min) + ":" + str(sec))
 
             currentSeekPlace = getSeekPos(player)
-            if not window.seekBar.isSliderDown() and window.seekBar.value() > 0:
+            if not window.seekBar.isSliderDown():
                 window.seekBar.setValue(int((currentSeekPlace)))
             else:
                 pass
