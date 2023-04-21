@@ -133,6 +133,10 @@ def play_audio(queue, mainWindow):
             mainWindow.update_art()
             mainWindow.update_end_time()
             mainWindow.update_playlist()
+        if (player.playing):
+            mainWindow.addToPlaylistButton.setEnabled(False)
+        if not player.playing:
+            mainWindow.addToPlaylistButton.setEnabled(True)
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -364,13 +368,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.popup = QtWidgets.QMessageBox()
         self.popup.setText("Options")
 
-        #self.timer = QtCore.QTimer()
-        # self.timer.timeout.connect(self.update_playlist)
-        # self.timer.timeout.connect(self.update_song)
-        # self.timer.timeout.connect(self.update_artist)
-        # self.timer.timeout.connect(self.update_art)
-        # self.timer.timeout.connect(self.update_end_time)
-        #self.timer.start(500)
 
         self.destroyed.connect(lambda: queue.put("close"))
 
