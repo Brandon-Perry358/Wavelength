@@ -135,6 +135,12 @@ def play_audio(queue, mainWindow):
         elif message.startswith("seek "):
             seek = int(message[5:])
             player.seek(seek)
+            min = int(player.curr_pos % 3600 / 60)
+            sec = int(player.curr_pos % 3600 % 60)
+            if sec < 10:
+                mainWindow.currintPosLabel.setText(str(min) + ":0" + str(sec))
+            else:
+                mainWindow.currintPosLabel.setText(str(min) + ":" + str(sec))
             print(seek)
         elif message == "close":
             player.stop()
@@ -294,7 +300,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.seekBar.setRange(0, 100)
         # print the current bar value to the console
         # print(self.seekBar.value())
-        self.seekBar.valueChanged.connect(lambda: queue.put("seek " + (self.seekBar.value()).__str__()))
+        self.seekBar.sliderReleased.connect(lambda: queue.put("seek " + (self.seekBar.value()).__str__()))
         # Set the color of the seek bar handle to green and show past progress as green in the bar
         self.seekBar.setStyleSheet("QSlider::handle:vertical {background-color: #39ff14;}")
 
@@ -512,7 +518,9 @@ def updateSongPos(window, player):
             if not window.seekBar.isSliderDown():
                 window.seekBar.setValue(int((currentSeekPlace)))
             else:
+                window.seekBar.sliderReleased.connect(lambda: queue.put("seek " + (window.seekBar.value()).__str__()))
                 pass
+    
 
 
 def getSeekPos(player):
