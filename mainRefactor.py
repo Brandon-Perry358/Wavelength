@@ -45,9 +45,11 @@ def play_audio(queue, mainWindow):
             mainWindow.currently_playing.clear()
             mainWindow.previous_songs.clear()
             mainWindow.temp_playlist.clear()
+            mainWindow.update_playlist()
         elif message == "play playlist":
             if player.active:
                 #player.stop()
+                mainWindow.seekBar.setValue(0)
                 # read the playlist and place the first song in the currently_playing list
                 mainWindow.currently_playing.append(mainWindow.playlist[0])
                 # remove the first song from the playlist
@@ -94,7 +96,7 @@ def play_audio(queue, mainWindow):
                 mainWindow.previous_songs.clear()
                 mainWindow.temp_playlist.clear()
             # remove the first song from the currently_playing list
-            else:
+            elif mainWindow.currently_playing:
                 mainWindow.previous_songs.insert(0, mainWindow.currently_playing[0])
                 mainWindow.currently_playing.clear()
                 #DONT REMOVE SEEK
@@ -155,9 +157,13 @@ def play_audio(queue, mainWindow):
             mainWindow.addToPlaylistButton.setEnabled(False)
         if not player.playing:
             mainWindow.addToPlaylistButton.setEnabled(True)
+    # if int(player.curr_pos) >= int(player.duration) and mainWindow.seekBar.value() >= int(player.duration):
+    #     queue.put("next song")
+    #     print("NEXT SONG CALL")
 
-        if player.curr_pos >= int(player.duration) and mainWindow.seekBar.value() >= int(player.duration):
-            queue.put("next song")
+
+
+
 
 
 class MainWindow(QtWidgets.QMainWindow):
@@ -520,7 +526,10 @@ def updateSongPos(window, player):
             else:
                 window.seekBar.sliderReleased.connect(lambda: queue.put("seek " + (window.seekBar.value()).__str__()))
                 pass
-    
+            if int(player.curr_pos) >= int(player.duration) and window.seekBar.value() >= int(player.duration):
+                window.queue.put("next song")
+                time.sleep(1.0)
+
 
 
 def getSeekPos(player):
