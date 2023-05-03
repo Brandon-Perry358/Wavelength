@@ -395,9 +395,6 @@ class MainWindow(QtWidgets.QMainWindow):
         self.volLabel.setStyleSheet("background-color: transparent;" + "color: #39ff14")
         self.volLabel.setFont(QtGui.QFont("Helvetica", 11, QtGui.QFont.Bold))
 
-
-
-
         self.destroyed.connect(lambda: queue.put("close"))
 
 
@@ -406,13 +403,17 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def browse(self):
         browseWidget = QtWidgets.QFileDialog(self)
-        file = browseWidget.getOpenFileName(browseWidget, 'Open file', 'C:\Wavelength', "Audio files (*.mp3 *.wav *.flac)")
+        #file = browseWidget.getOpenFileName(browseWidget, 'Open file', 'C:\Wavelength', "Audio files (*.mp3 *.wav *.flac)")
+        #allow multiple files to be selected
+        file = browseWidget.getOpenFileNames(browseWidget, 'Select Song(s) to Add to Queue', 'C:\Wavelength', "Audio files (*.mp3 *.wav *.flac)")
         browseWidget.destroy()
         if file[0] == "":
             # don't return anything
             pass
         else:
-            return file[0]
+            for song in file[0]:
+                self.playlist.append(song)
+            self.update_playlist()
 
     def update_song(self):
         if len(self.currently_playing) == 0:

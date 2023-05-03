@@ -91,7 +91,6 @@ tradVolLabelW = 25
 def play_audio(queue):
     # code for initializing and playing audio
     player = Playback()
-
     player.set_volume(0.5)
     while True:
         message = queue.get()
@@ -490,8 +489,6 @@ def update_current_time(seekBar, currintPosLabel, currently_playing):
 queue = Queue()
 audio_thread = threading.Thread(target=play_audio, args=(queue,))
 gui_thread = threading.Thread(target=gui, args=(queue,))
-
-
 
 audio_thread.start()
 gui_thread.start()
