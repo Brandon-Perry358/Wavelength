@@ -1,15 +1,14 @@
-import threading
-
-from PyQt5 import QtWidgets, QtGui, QtCore
 import sys
 import time
-import os
+import threading
 from queue import Queue
+# GUI Library
+from PyQt5 import QtWidgets, QtGui, QtCore
+# Audio Handler Library
 from just_playback import Playback
-from PySide6.QtWidgets import QApplication, QWidget, QPushButton, QFileDialog, QLabel, QListWidget
-from PySide6.QtCore import Slot, Qt
-from PySide6.QtGui import QPixmap, QFont
+# Track Metadata Library
 from tinytag import tinytag
+# Our XML Handler
 import XMLHandler
 
 
@@ -285,6 +284,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.savePlaylistCompleteWindow = QtWidgets.QMessageBox()
         self.savePlaylistCompleteWindow.setWindowTitle("Save Playlist")
 
+        self.loadPlaylistWindow = QtWidgets.QMessageBox()
+        self.loadPlaylistWindow.setWindowTitle("Load Playlist")
+
+
 ##############################
 #                           Main Window                              #
 ##############################
@@ -371,12 +374,13 @@ class MainWindow(QtWidgets.QMainWindow):
         self.playlistSaveButton = QtWidgets.QPushButton("Save Playlist", self)
         self.playlistSaveButton.setGeometry(605, 20, 75, 20)
         self.playlistSaveButton.setStyleSheet("background-color: #39ff14;")
-        self.playlistSaveButton.clicked.connect(self.getPlaylistName)
+        self.playlistSaveButton.clicked.connect(self.savePlaylist)
 
         # make playlist load button
         self.playlistLoadButton = QtWidgets.QPushButton("Load Playlist", self)
         self.playlistLoadButton.setGeometry(680, 20, 75, 20)
         self.playlistLoadButton.setStyleSheet("background-color: #39ff14;")
+        self.playlistLoadButton.clicked.connect(self.loadPlaylist)
 
         # make song name under art
         self.songLabel = QtWidgets.QLabel(self)
@@ -446,7 +450,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.destroyed.connect(lambda: queue.put("close"))
 
 
-    def getPlaylistName(self):
+    def savePlaylist(self):
         playlistName, done = QtWidgets.QInputDialog.getText(self.savePlaylistWindow, "Save Queue To Playlist", "Enter Playlist Name:")
 
         if done:
@@ -460,6 +464,29 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 self.savePlaylistCompleteWindow.setText("Playlist not saved")
                 self.savePlaylistCompleteWindow.show()
+
+    def loadPlaylist(self):
+        playlists = self.XMLHandler.getPlaylistNames()
+        # playlists.pop()
+
+        self.loadPlaylistList = QtWidgets.QListWidget()
+        self.loadPlaylistList.setWindowTitle("Double Click to Load Playlist")
+        for playlistName in playlists:
+            # print(playlistName)
+            self.loadPlaylistList.addItem(playlistName)
+
+        self.loadPlaylistList.setGeometry(250, 100, 400, 300)
+        #self.loadPlaylistList.show()
+
+        playlistTracks = self.XMLHandler.loadPlaylistByName("Demo Mix")
+
+        for x in playlistTracks:
+            self.playlist.append(x)
+            self.update_playlist()
+
+
+
+
 
     def showWindow(self):
         self.show()

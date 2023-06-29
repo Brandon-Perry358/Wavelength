@@ -67,4 +67,34 @@ class XMLHandler:
                 print(trackList.tag, trackList.attrib, trackList.text)
                 # Track location
                 for track in trackList:
-                    print(track.tag, track.attrib, track.text)
+                    print(track.text)
+
+    def getPlaylistNames(self):
+        playlistNames = []
+        tree = ET.parse('Playlists.xml')
+        root = tree.getroot()
+        fillerClear = 0
+        for playlists in root:
+            for playlistName in playlists:
+                if fillerClear % 2 == 0:
+                    playlistNames.append(playlistName.text)
+                fillerClear += 1
+        #print(playlistNames)
+        return playlistNames
+
+    def loadPlaylistByName(self, playlistName):
+        retPlaylist = []
+        tree = ET.parse('Playlists.xml')
+        root = tree.getroot()
+        for playlists in root:
+            for playlistInfo in playlists:
+                if playlistInfo.text == playlistName:
+                    #print("X")
+                    print(playlistInfo.text)
+                    for track in playlists[1]:
+                        retPlaylist.append(track.text)
+
+                    return retPlaylist
+        return retPlaylist
+
+
