@@ -10,6 +10,8 @@ from just_playback import Playback
 from tinytag import tinytag
 # Our XML Handler
 import XMLHandler
+# Our Theme changing/saving window
+import themeWindow
 
 
 def play_audio(queue, mainWindow):
@@ -29,9 +31,9 @@ def play_audio(queue, mainWindow):
                 min = int(player.curr_pos % 3600 / 60)
                 sec = int(player.curr_pos % 3600 % 60)
                 if sec < 10:
-                    mainWindow.currintPosLabel.setText(str(min) + ":0" + str(sec))
+                    mainWindow.curPosLabel.setText(str(min) + ":0" + str(sec))
                 else:
-                    mainWindow.currintPosLabel.setText(str(min) + ":" + str(sec))
+                    mainWindow.curPosLabel.setText(str(min) + ":" + str(sec))
                 # print("Time left in song: " + str(int(player.duration) - int(player.curr_pos)))
             elif not player.active and not player.playing:
                 queue.put("play playlist")
@@ -123,27 +125,34 @@ def play_audio(queue, mainWindow):
                 mainWindow.update_end_time()
                 mainWindow.update_playlist()
                 player.play()
-        elif message == "add to playlist":
+        elif message == "browse":
             file = window.browse()
             if file == None:
                 pass
             else:
                 mainWindow.playlist.append(file)
                 mainWindow.update_playlist()
+        elif message == "load playlist":
+            for x in mainWindow.playlistToLoad:
+                if x == None:
+                        pass
+                else:
+                    mainWindow.playlist.append(x)
+            mainWindow.update_playlist()
         elif message.startswith("volume "):
             volume = int(message[7:])
             player.set_volume(volume / 100)
-            print("Volume is: " + (volume).__str__())
+            # print("Volume is: " + (volume).__str__())
         elif message.startswith("seek "):
             seek = int(message[5:])
             player.seek(seek)
             min = int(player.curr_pos % 3600 / 60)
             sec = int(player.curr_pos % 3600 % 60)
             if sec < 10:
-                mainWindow.currintPosLabel.setText(str(min) + ":0" + str(sec))
+                mainWindow.curPosLabel.setText(str(min) + ":0" + str(sec))
             else:
-                mainWindow.currintPosLabel.setText(str(min) + ":" + str(sec))
-            print(seek)
+                mainWindow.curPosLabel.setText(str(min) + ":" + str(sec))
+            # print(seek)
         elif message == "close":
             player.stop()
             break
@@ -175,15 +184,16 @@ class MainWindow(QtWidgets.QMainWindow):
         self.currently_playing = []
         self.previous_songs = []
         self.temp_playlist = []
+        self.playlistToLoad = []
         self.XMLHandler = XMLHandler.XMLHandler()
 
 ##############################
 #                      Position info                                    #
 ##############################
-        self.newCurrintPosX = 450
-        self.newCurrintPosY = 50
-        self.newCurrintPosH = 30
-        self.newCurrintPosW = 30
+        self.newCurPosX = 450
+        self.newCurPosY = 50
+        self.newCurPosH = 30
+        self.newCurPosW = 30
 
         self.newSeekBarX = 450
         self.newSeekBarY = 75
@@ -225,10 +235,10 @@ class MainWindow(QtWidgets.QMainWindow):
         self.newPlaylistLoadButtonH = 75
         self.newPlaylistLoadButtonW = 20
 
-        self.tradCurrintPosX = 425
-        self.tradCurrintPosY = 448
-        self.tradCurrintPosH = 30
-        self.tradCurrintPosW = 30
+        self.tradCurPosX = 425
+        self.tradCurPosY = 448
+        self.tradCurPosH = 30
+        self.tradCurPosW = 30
 
         self.tradSeekBarX = 450
         self.tradSeekBarY = 450
@@ -273,10 +283,31 @@ class MainWindow(QtWidgets.QMainWindow):
         self.layoutNew = True
 
 ##############################
+#                             GUI Colors                               #
+# self.addToPlaylistButton.setStyleSheet("background-color: #39ff14;")
+##############################
+        self.windowBackgroundColor = "#000000"
+        self.buttonColor = "#39ff14"
+        self.buttonTextColor = "#000000"
+        self.albumArtBorderColor = "#39ff14"
+        self.curPosLabelColor = "#39ff14"
+        self.seekBarHandleColor = "#39ff14"
+        self.trackLengthLabelColor = "#39ff14"
+        self.artistTextColor = "#39ff14"
+        self.trackTextColor = "#39ff14"
+        self.volumeBarColor = "#39ff14"
+        self.volumeHandleColor = "#39ff14"
+        self.volumeBackgroundColor = "#ffffff"
+        self.volumeLabelColor = "#39ff14"
+        self.playlistLabelColor = "#39ff14"
+
+
+
+##############################
 #                          Other Windows                            #
 ##############################
-        self.popup = QtWidgets.QMessageBox()
-        self.popup.setText("Options")
+
+        self.themeWindow = None
 
         self.savePlaylistWindow = QtWidgets.QMessageBox()
         self.savePlaylistWindow.setWindowTitle("Save Playlist")
@@ -294,48 +325,48 @@ class MainWindow(QtWidgets.QMainWindow):
         self.setFixedSize(QtCore.QSize(775, 500))
         self.setWindowTitle("Wavelength Audio Player")
         self.setWindowIcon(QtGui.QIcon("WavelengthIcon.png"))
-        self.setStyleSheet("background-color: black;")
+        self.setStyleSheet("background-color: " + self.windowBackgroundColor + ";")
         self.setGeometry(100, 100, 775, 500)
 
         # code for the add to playlist button
         self.addToPlaylistButton = QtWidgets.QPushButton("Browse", self)
-        self.addToPlaylistButton.setStyleSheet("background-color: #39ff14;")
+        self.addToPlaylistButton.setStyleSheet("background-color:" + self.buttonColor + "; color: " + self.buttonTextColor + ";")
         self.addToPlaylistButton.setFont(QtGui.QFont("Helvetica", 10, QtGui.QFont.Bold))
-        self.addToPlaylistButton.clicked.connect(lambda: queue.put("add to playlist"))
+        self.addToPlaylistButton.clicked.connect(lambda: queue.put("browse"))
         self.addToPlaylistButton.move(0, 0)
 
         # code for creating the stop button
         self.stopButton = QtWidgets.QPushButton("Stop", self)
         self.stopButton.clicked.connect(lambda: queue.put("stop"))
         self.stopButton.setFont(QtGui.QFont("Helvetica", 10, QtGui.QFont.Bold))
-        self.stopButton.setStyleSheet("background-color: #39ff14;")
+        self.stopButton.setStyleSheet("background-color:" + self.buttonColor + "; color: " + self.buttonTextColor + ";")
         self.stopButton.move(100, 0)
 
         self.layoutSwap = QtWidgets.QPushButton("Swap Layout", self)
         self.layoutSwap.clicked.connect(self.swapLayout)
         self.layoutSwap.setFont(QtGui.QFont("Helvetica", 10, QtGui.QFont.Bold))
-        self.layoutSwap.setStyleSheet("background-color: #39ff14;")
+        self.layoutSwap.setStyleSheet("background-color:" + self.buttonColor + "; color: " + self.buttonTextColor + ";")
         self.layoutSwap.move(200, 0)
 
-        self.optionsButton = QtWidgets.QPushButton("Options", self)
-        self.optionsButton.setFont(QtGui.QFont("Helvetica", 10, QtGui.QFont.Bold))
-        self.optionsButton.setStyleSheet("background-color: #39ff14;")
-        self.optionsButton.clicked.connect(self.popup.show)
-        self.optionsButton.move(300, 0)
+        self.saveThemeButton = QtWidgets.QPushButton("Change Theme", self)
+        self.saveThemeButton.setFont(QtGui.QFont("Helvetica", 10, QtGui.QFont.Bold))
+        self.saveThemeButton.setStyleSheet("background-color:" + self.buttonColor + "; color: " + self.buttonTextColor + ";")
+        self.saveThemeButton.clicked.connect(self.changeSaveTheme)
+        self.saveThemeButton.move(300, 0)
 
         self.albumArt = QtWidgets.QLabel(self)
         self.albumPixmap = QtGui.QPixmap()
         self.albumArt.setPixmap(QtGui.QPixmap("WavelengthArt.png"))
         # Make a green border around the album art
-        self.albumArt.setStyleSheet("border: 2px solid #39ff14;")
+        self.albumArt.setStyleSheet("border: 2px solid " + self.albumArtBorderColor + ";")
         self.albumArt.setScaledContents(True)
         self.albumArt.setGeometry(20, 40, 400, 360)
 
         # Show current song location
-        self.currintPosLabel = QtWidgets.QLabel(self)
-        self.currintPosLabel.setGeometry(450, 50, 30, 30)
-        self.currintPosLabel.setText("0:00")
-        self.currintPosLabel.setStyleSheet("color: #39ff14;")
+        self.curPosLabel = QtWidgets.QLabel(self)
+        self.curPosLabel.setGeometry(450, 50, 30, 30)
+        self.curPosLabel.setText("0:00")
+        self.curPosLabel.setStyleSheet("color: " + self.curPosLabelColor + ";")
 
         # make seek bar
         self.seekBar = QtWidgets.QSlider(self)
@@ -348,13 +379,13 @@ class MainWindow(QtWidgets.QMainWindow):
         # print(self.seekBar.value())
         self.seekBar.sliderReleased.connect(lambda: queue.put("seek " + (self.seekBar.value()).__str__()))
         # Set the color of the seek bar handle to green and show past progress as green in the bar
-        self.seekBar.setStyleSheet("QSlider::handle:vertical {background-color: #39ff14;}")
+        self.seekBar.setStyleSheet("QSlider::handle:vertical {background-color: " + self.seekBarHandleColor + "}")
 
         # show total song time
         self.trackLengthLabel = QtWidgets.QLabel(self)
         self.trackLengthLabel.setGeometry(450, 375, 30, 30)
         self.trackLengthLabel.setText("0:00")
-        self.trackLengthLabel.setStyleSheet("color: #39ff14;")
+        self.trackLengthLabel.setStyleSheet("color: " + self.trackLengthLabelColor + ";")
 
         # make a list widget to display the playlist
         self.playlistWidget = QtWidgets.QListWidget(self)
@@ -367,19 +398,19 @@ class MainWindow(QtWidgets.QMainWindow):
         self.playlistLabel.setGeometry(500, 9, 250, 40)
         self.playlistLabel.setText("Playing Next:")
         # set the color of the label to neon green
-        self.playlistLabel.setStyleSheet("background-color: transparent;" + "color: #39ff14;")
+        self.playlistLabel.setStyleSheet("background-color: transparent;" + "color: " + self.playlistLabelColor + ";")
         self.playlistLabel.setFont(QtGui.QFont("Helvetica", 11, QtGui.QFont.Bold))
 
         # make playlist save button
         self.playlistSaveButton = QtWidgets.QPushButton("Save Playlist", self)
         self.playlistSaveButton.setGeometry(605, 20, 75, 20)
-        self.playlistSaveButton.setStyleSheet("background-color: #39ff14;")
+        self.playlistSaveButton.setStyleSheet("background-color:" + self.buttonColor + "; color: " + self.buttonTextColor + ";")
         self.playlistSaveButton.clicked.connect(self.savePlaylist)
 
         # make playlist load button
         self.playlistLoadButton = QtWidgets.QPushButton("Load Playlist", self)
         self.playlistLoadButton.setGeometry(680, 20, 75, 20)
-        self.playlistLoadButton.setStyleSheet("background-color: #39ff14;")
+        self.playlistLoadButton.setStyleSheet("background-color:" + self.buttonColor + "; color: " + self.buttonTextColor + ";")
         self.playlistLoadButton.clicked.connect(self.loadPlaylist)
 
         # make song name under art
@@ -388,7 +419,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.songLabel.setText("Wavelength")
         self.songLabel.setAlignment(QtCore.Qt.AlignCenter)
         # set text box color to transparent
-        self.songLabel.setStyleSheet("background-color: transparent;" + "color: #39ff14")
+        self.songLabel.setStyleSheet("background-color: transparent;" + "color: " + self.trackTextColor + ";")
         self.songLabel.setFont(QtGui.QFont("Helvetica", 15, QtGui.QFont.Bold))
 
         # make artist name under song title
@@ -397,7 +428,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.artistLabel.setText("Spack & Brandon P.")
         self.artistLabel.setAlignment(QtCore.Qt.AlignCenter)
         # set text box color to transparent
-        self.artistLabel.setStyleSheet("background-color: transparent;" + "color: #39ff14")
+        self.artistLabel.setStyleSheet("background-color: transparent;" + "color: " + self.artistTextColor + ";")
         self.artistLabel.setFont(QtGui.QFont("Helvetica", 11))
 
         # create button
@@ -406,7 +437,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.skipBackButton.move(20, 450)
         self.skipBackButton.setGeometry(20, 450, 133, 35)
         self.skipBackButton.setStyleSheet(
-            "background-color: #39ff14;" + "background-image : url(skipBackButton.png); background-repeat : no-repeat; background-position : center;")
+            "background-color:" + self.buttonColor + ";" + "background-image : url(skipBackButton.png); background-repeat : no-repeat; background-position : center;")
 
         # code for creating the button
         self.playPauseButton = QtWidgets.QPushButton("", self)
@@ -416,7 +447,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.playPauseButton.setGeometry(153, 450, 134, 35)
         # add image to playpause button and center it
         self.playPauseButton.setStyleSheet(
-            "background-color: #39ff14;" + "background-image : url(playPauseButton.png); background-repeat : no-repeat; background-position : center;")
+            "background-color:" + self.buttonColor + ";" + "background-image : url(playPauseButton.png); background-repeat : no-repeat; background-position : center;")
 
         # create button
         self.skipForwardButton = QtWidgets.QPushButton("", self)
@@ -424,7 +455,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.skipForwardButton.move(225, 450)
         self.skipForwardButton.setGeometry(287, 450, 133, 35)
         self.skipForwardButton.setStyleSheet(
-            "background-color: #39ff14;" + "background-image : url(skipForwardButton.png); background-repeat : no-repeat; background-position : center;")
+            "background-color:" + self.buttonColor + ";" + "background-image : url(skipForwardButton.png); background-repeat : no-repeat; background-position : center;")
 
         # make volume bar
         self.volBar = QtWidgets.QSlider(self)
@@ -437,14 +468,20 @@ class MainWindow(QtWidgets.QMainWindow):
         self.volBar.valueChanged.connect(lambda: queue.put("volume " + (self.volBar.value()).__str__()))
         # set the color of the slider bar to neon green
         self.volBar.setStyleSheet(
-            "QSlider::groove:horizontal {border: 1px solid #bbb; background: white; height: 10px; border-radius: 4px;}" + "QSlider::sub-page:horizontal {background: #39ff14; border: 1px solid #777; height: 10px; border-radius: 4px;}" + "QSlider::add-page:horizontal {background: #fff; border: 1px solid #777; height: 10px; border-radius: 4px;}" + "QSlider::handle:horizontal {background: #39ff14; border: 1px solid #777; width: 13px; margin-top: -2px; margin-bottom: -2px; border-radius: 4px;}" + "QSlider::handle:horizontal:hover {background: #39ff14; border: 1px solid #444; width: 13px; margin-top: -2px; margin-bottom: -2px; border-radius: 4px;}" + "QSlider::sub-page:horizontal:disabled {background: #bbb; border-color: #999;}" + "QSlider::add-page:horizontal:disabled {background: #eee; border-color: #999;}" + "QSlider::handle:horizontal:disabled {background: #eee; border: 1px solid #aaa; border-radius: 4px;}")
+            "QSlider::groove:horizontal {border: 1px solid #bbb; background: " + self.volumeBackgroundColor + "; height: 10px; border-radius: 4px;}" +
+            "QSlider::sub-page:horizontal {background: " + self.volumeBarColor + "; border: 1px solid #777; height: 10px; border-radius: 4px;}" +
+            "QSlider::add-page:horizontal {background: #fff; border: 1px solid #777; height: 10px; border-radius: 4px;}" +
+            "QSlider::handle:horizontal {background: #39ff14; border: 1px solid #777; width: 13px; margin-top: -2px; margin-bottom: -2px; border-radius: 4px;}" +
+            "QSlider::handle:horizontal:hover {background: " + self.volumeHandleColor + "; border: 1px solid #444; width: 13px; margin-top: -2px; margin-bottom: -2px; border-radius: 4px;}" +
+            "QSlider::sub-page:horizontal:disabled {background: #bbb; border-color: #999;}" + "QSlider::add-page:horizontal:disabled {background: #eee; border-color: #999;}" +
+            "QSlider::handle:horizontal:disabled {background: #eee; border: 1px solid #aaa; border-radius: 4px;}")
 
         # make a lablel for the volume bar above the top left corner
         self.volLabel = QtWidgets.QLabel(self)
         self.volLabel.setGeometry(450, 430, 300, 25)
         self.volLabel.setText("Volume")
         # set the color of the label to neon green
-        self.volLabel.setStyleSheet("background-color: transparent;" + "color: #39ff14")
+        self.volLabel.setStyleSheet("background-color: transparent;" + "color: " + self.volumeLabelColor + ";")
         self.volLabel.setFont(QtGui.QFont("Helvetica", 11, QtGui.QFont.Bold))
 
         self.destroyed.connect(lambda: queue.put("close"))
@@ -476,15 +513,26 @@ class MainWindow(QtWidgets.QMainWindow):
             self.loadPlaylistList.addItem(playlistName)
 
         self.loadPlaylistList.setGeometry(250, 100, 400, 300)
-        #self.loadPlaylistList.show()
+        self.loadPlaylistList.show()
 
-        playlistTracks = self.XMLHandler.loadPlaylistByName("Demo Mix")
-
-        for x in playlistTracks:
-            self.playlist.append(x)
-            self.update_playlist()
+        self.loadPlaylistList.itemDoubleClicked.connect(self.loadPlaylistFromXML)
 
 
+        self.playlistToLoad = []
+
+        # playlistTracks = self.XMLHandler.loadPlaylistByName("Demo Mix")
+
+    def loadPlaylistFromXML(self, playlist):
+        # print(playlist.text())
+        self.playlistToLoad = self.XMLHandler.loadPlaylistByName(playlist.text())
+        queue.put("load playlist")
+        self.loadPlaylistList.hide()
+
+
+
+
+    def showThemeWindow(self):
+        self.themeWindow.setWindowTitle("Theme")
 
 
 
@@ -571,7 +619,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def swapLayout(self):
         if (self.layoutNew):
-            self.currintPosLabel.setGeometry(self.tradCurrintPosX, self.tradCurrintPosY, self.tradCurrintPosH, self.tradCurrintPosW)
+            self.curPosLabel.setGeometry(self.tradCurPosX, self.tradCurPosY, self.tradCurPosH, self.tradCurPosW)
             self.seekBar.setGeometry(self.tradSeekBarX, self.tradSeekBarY, self.tradSeekBarH, self.tradSeekBarW)
             self.seekBar.setOrientation(QtCore.Qt.Horizontal)
             self.seekBar.setInvertedAppearance(False)
@@ -588,7 +636,7 @@ class MainWindow(QtWidgets.QMainWindow):
             self.playlistLoadButton.setGeometry(self.tradPlaylistLoadButtonX, self.tradPlaylistLoadButtonY, self.tradPlaylistLoadButtonH, self.tradPlaylistLoadButtonW)
             self.layoutNew = False
         else:
-            self.currintPosLabel.setGeometry(self.newCurrintPosX, self.newCurrintPosY, self.newCurrintPosH, self.newCurrintPosW)
+            self.curPosLabel.setGeometry(self.newCurPosX, self.newCurPosY, self.newCurPosH, self.newCurPosW)
             self.seekBar.setGeometry(self.newSeekBarX, self.newSeekBarY, self.newSeekBarH, self.newSeekBarW)
             self.seekBar.setOrientation(QtCore.Qt.Vertical)
             self.seekBar.setInvertedAppearance(True)
@@ -606,6 +654,97 @@ class MainWindow(QtWidgets.QMainWindow):
             self.layoutNew = True
 
 
+    def changeSaveTheme(self):
+        self.themeWindow = themeWindow.ThemeDialog()
+        self.themeWindow.curBackgroundColor.setText(self.windowBackgroundColor)
+        self.themeWindow.curButtonColor.setText(self.buttonColor)
+        self.themeWindow.curButtonTextColor.setText(self.buttonTextColor)
+        self.themeWindow.curArtBorderColor.setText(self.albumArtBorderColor)
+        self.themeWindow.curPosLabelColor.setText(self.curPosLabelColor)
+        self.themeWindow.curSeekHandleColor.setText(self.seekBarHandleColor)
+        self.themeWindow.curTrackLengthColor.setText(self.trackLengthLabelColor)
+        self.themeWindow.curArtistColor.setText(self.artistTextColor)
+        self.themeWindow.curTrackColor.setText(self.trackTextColor)
+        self.themeWindow.curVolumeBarColor.setText(self.volumeBackgroundColor)
+        self.themeWindow.curVolumeHandleColor.setText(self.volumeHandleColor)
+        self.themeWindow.curVolumeTextColor.setText(self.volumeLabelColor)
+        self.themeWindow.curPlaylistTextColor.setText(self.playlistLabelColor)
+
+        self.themeWindow.applyButton.clicked.connect(self.updateColorValues)
+
+        self.themeWindow.show()
+
+
+    def updateColorValues(self):
+        newColors = self.themeWindow.getResponse()
+        for x in newColors:
+            if x == "":
+                pass
+            else:
+                match newColors.index(x):
+                    case 0:
+                        self.windowBackgroundColor = x
+                    case 1:
+                        self.buttonColor = x
+                    case 2:
+                        self.buttonTextColor = x
+                    case 3:
+                        self.albumArtBorderColor = x
+                    case 4:
+                        self.curPosLabelColor = x
+                    case 5:
+                        self.seekBarHandleColor = x
+                    case 6 :
+                        self.trackLengthLabelColor = x
+                    case 7:
+                        self.artistTextColor = x
+                    case 8:
+                        self.trackTextColor = x
+                    case 9:
+                        self.volumeBarColor =x
+                    case 10:
+                        self.volumeHandleColor = x
+                    case 11:
+                        self.volumeLabelColor = x
+                    case 12:
+                        self.playlistLabelColor = x
+                    case _:
+                        pass
+        self.updateTheme()
+        self.themeWindow.close()
+
+
+    def updateTheme(self):
+        self.addToPlaylistButton.setStyleSheet("background-color:" + self.buttonColor + "; color: " + self.buttonTextColor + ";")
+        self.stopButton.setStyleSheet("background-color:" + self.buttonColor + "; color: " + self.buttonTextColor + ";")
+        self.layoutSwap.setStyleSheet("background-color:" + self.buttonColor + "; color: " + self.buttonTextColor + ";")
+        self.saveThemeButton.setStyleSheet("background-color:" + self.buttonColor + "; color: " + self.buttonTextColor + ";")
+        self.albumArt.setStyleSheet("border: 2px solid " + self.albumArtBorderColor + ";")
+        self.curPosLabel.setStyleSheet("color: " + self.curPosLabelColor + ";")
+        self.seekBar.setStyleSheet("QSlider::handle:vertical {background-color: " + self.seekBarHandleColor + "}")
+        self.trackLengthLabel.setStyleSheet("color: " + self.trackLengthLabelColor + ";")
+        self.playlistWidget.setStyleSheet("background-color: white;")
+        self.playlistLabel.setStyleSheet("background-color: transparent;" + "color: " + self.playlistLabelColor + ";")
+        self.playlistSaveButton.setStyleSheet("background-color:" + self.buttonColor + "; color: " + self.buttonTextColor + ";")
+        self.playlistLoadButton.setStyleSheet("background-color:" + self.buttonColor + "; color: " + self.buttonTextColor + ";")
+        self.songLabel.setStyleSheet("background-color: transparent;" + "color: " + self.trackTextColor + ";")
+        self.artistLabel.setStyleSheet("background-color: transparent;" + "color: " + self.artistTextColor + ";")
+        self.skipBackButton.setStyleSheet(
+            "background-color:" + self.buttonColor + ";" + "background-image : url(skipBackButton.png); background-repeat : no-repeat; background-position : center;")
+        self.playPauseButton.setStyleSheet(
+            "background-color:" + self.buttonColor + ";" + "background-image : url(playPauseButton.png); background-repeat : no-repeat; background-position : center;")
+        self.skipForwardButton.setStyleSheet(
+            "background-color:" + self.buttonColor + ";" + "background-image : url(skipForwardButton.png); background-repeat : no-repeat; background-position : center;")
+        self.volBar.setStyleSheet(
+            "QSlider::groove:horizontal {border: 1px solid #bbb; background: " + self.volumeBackgroundColor + "; height: 10px; border-radius: 4px;}" +
+            "QSlider::sub-page:horizontal {background: " + self.volumeBarColor + "; border: 1px solid #777; height: 10px; border-radius: 4px;}" +
+            "QSlider::add-page:horizontal {background: #fff; border: 1px solid #777; height: 10px; border-radius: 4px;}" +
+            "QSlider::handle:horizontal {background: #39ff14; border: 1px solid #777; width: 13px; margin-top: -2px; margin-bottom: -2px; border-radius: 4px;}" +
+            "QSlider::handle:horizontal:hover {background: " + self.volumeHandleColor + "; border: 1px solid #444; width: 13px; margin-top: -2px; margin-bottom: -2px; border-radius: 4px;}" +
+            "QSlider::sub-page:horizontal:disabled {background: #bbb; border-color: #999;}" + "QSlider::add-page:horizontal:disabled {background: #eee; border-color: #999;}" +
+            "QSlider::handle:horizontal:disabled {background: #eee; border: 1px solid #aaa; border-radius: 4px;}")
+        self.volLabel.setStyleSheet("background-color: transparent;" + "color: " + self.volumeLabelColor + ";")
+
 
 def updateSongPos(window, player):
     while True:
@@ -613,9 +752,9 @@ def updateSongPos(window, player):
             min = int(player.curr_pos % 3600 / 60)
             sec = int(player.curr_pos % 3600 % 60)
             if sec < 10:
-                window.currintPosLabel.setText(str(min) + ":0" + str(sec))
+                window.curPosLabel.setText(str(min) + ":0" + str(sec))
             else:
-                window.currintPosLabel.setText(str(min) + ":" + str(sec))
+                window.curPosLabel.setText(str(min) + ":" + str(sec))
 
             currentSeekPlace = getSeekPos(player)
             if not window.seekBar.isSliderDown():
@@ -628,9 +767,9 @@ def updateSongPos(window, player):
                 time.sleep(1.0)
 
 
-
 def getSeekPos(player):
     return (int((player.curr_pos)))
+
 
 queue = Queue()
 app = QtWidgets.QApplication(sys.argv)
