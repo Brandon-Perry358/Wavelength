@@ -318,6 +318,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.loadPlaylistWindow = QtWidgets.QMessageBox()
         self.loadPlaylistWindow.setWindowTitle("Load Playlist")
 
+        self.saveThemeWindow = QtWidgets.QMessageBox()
+        self.saveThemeWindow.setWindowTitle("Save Theme")
+
+        self.saveThemeCompleteWindow = QtWidgets.QMessageBox()
+        self.saveThemeCompleteWindow.setWindowTitle("Theme Saved!")
+        self.saveThemeCompleteWindow.setText("Theme Saved!")
+
+        self.saveThemeIncompleteWindow = QtWidgets.QMessageBox()
+        self.saveThemeIncompleteWindow.setWindowTitle("Theme Not Saved")
+        self.saveThemeIncompleteWindow.setText("Error Theme Not Saved")
+
 
 ##############################
 #                           Main Window                              #
@@ -657,6 +668,7 @@ class MainWindow(QtWidgets.QMainWindow):
     def changeSaveTheme(self):
         self.themeWindow = themeWindow.ThemeDialog()
         self.themeWindow.curBackgroundColor.setText(self.windowBackgroundColor)
+        self.themeWindow.curBackgroundColorBox.setStyleSheet("background-color: " + self.windowBackgroundColor + ";")
         self.themeWindow.curButtonColor.setText(self.buttonColor)
         self.themeWindow.curButtonTextColor.setText(self.buttonTextColor)
         self.themeWindow.curArtBorderColor.setText(self.albumArtBorderColor)
@@ -672,7 +684,27 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.themeWindow.applyButton.clicked.connect(self.updateColorValues)
 
+        self.themeWindow.saveButton.clicked.connect(self.saveTheme)
+
         self.themeWindow.show()
+
+
+    def saveTheme(self):
+        self.updateColorValues()
+        themeArray = [self.windowBackgroundColor, self.buttonColor,
+                      self.buttonTextColor, self.albumArtBorderColor,
+                      self.curPosLabelColor, self.seekBarHandleColor,
+                      self.trackLengthLabelColor, self.artistTextColor,
+                      self.trackTextColor, self.volumeBarColor,
+                      self.volumeLabelColor, self.playlistLabelColor]
+
+        themeName, done = QtWidgets.QInputDialog.getText(self.saveThemeWindow, "Save Theme", "Enter Theme Name:")
+
+        if done:
+            if self.XMLHandler.saveTheme(themeName, themeArray):
+                self.saveThemeCompleteWindow.show()
+            else:
+                self.saveThemeIncompleteWindow.show()
 
 
     def updateColorValues(self):
@@ -701,7 +733,7 @@ class MainWindow(QtWidgets.QMainWindow):
                     case 8:
                         self.trackTextColor = x
                     case 9:
-                        self.volumeBarColor =x
+                        self.volumeBarColor = x
                     case 10:
                         self.volumeHandleColor = x
                     case 11:
@@ -715,6 +747,7 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
     def updateTheme(self):
+        self.setStyleSheet("background-color:" + self.windowBackgroundColor + ";")
         self.addToPlaylistButton.setStyleSheet("background-color:" + self.buttonColor + "; color: " + self.buttonTextColor + ";")
         self.stopButton.setStyleSheet("background-color:" + self.buttonColor + "; color: " + self.buttonTextColor + ";")
         self.layoutSwap.setStyleSheet("background-color:" + self.buttonColor + "; color: " + self.buttonTextColor + ";")

@@ -5,7 +5,7 @@ class XMLHandler:
     # File check takes in the file type of either Theme, OnStart, or Playlist and makes sure the file exists
     def fileCheck(self, fileType):
         match fileType:
-            case "Theme":
+            case "Themes":
                 if not os.path.isfile("./Themes.xml"):
                     f = open("Themes.xml", "w")
                     f.write("<themes>\n</themes>")
@@ -96,5 +96,28 @@ class XMLHandler:
 
                     return retPlaylist
         return retPlaylist
+
+    def saveTheme(self, themeName, themeArray):
+        self.fileCheck("Themes")
+        # TODO Check if theme exists
+
+        # if theme does not already exist
+        tree = ET.parse('Themes.xml')
+        ET.indent(tree, "    ", 0)
+
+        themes = tree.getroot()
+        newThemeName = ET.SubElement(themes, "themeNames")
+        newThemeName.text = str(themeName)
+        newElementsList = ET.SubElement(newThemeName, "elementHexValues")
+        elementNum = 1
+        for x in themeArray:
+            newElementX = ET.SubElement(newElementsList, "element" + str(elementNum))
+            newElementX.text = str(x)
+            elementNum += 1
+
+        # If successful commit
+        tree.write("Themes.xml")
+        return True
+
 
 

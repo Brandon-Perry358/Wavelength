@@ -5,7 +5,7 @@ class ThemeDialog(QtWidgets.QDialog):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Change and save theme")
-        self.setGeometry(100, 100, 300, 500)
+        self.setGeometry(100, 100, 400, 500)
 
         self.labelLabel = QtWidgets.QLabel(self)
         self.labelLabel.setGeometry(5, 0, 100, 25)
@@ -16,7 +16,7 @@ class ThemeDialog(QtWidgets.QDialog):
         self.hexLabel.setText("Current Hex Value")
 
         self.newLabel = QtWidgets.QLabel(self)
-        self.newLabel.setGeometry(200, 0, 100, 25)
+        self.newLabel.setGeometry(250, 0, 100, 25)
         self.newLabel.setText("New Hex Value")
 
         self.curBackgroundColorLabel = QtWidgets.QLabel(self)
@@ -25,9 +25,12 @@ class ThemeDialog(QtWidgets.QDialog):
 
         self.curBackgroundColor = QtWidgets.QLabel(self)
         self.curBackgroundColor.setGeometry(100, 30, 100, 25)
+        self.curBackgroundColorBox = QtWidgets.QWidget(self)
+        self.curBackgroundColorBox.setGeometry(160, 30, 25, 25)
+
 
         self.newBackgroundColor = QtWidgets.QLineEdit(self)
-        self.newBackgroundColor.setGeometry(200, 30, 80, 25)
+        self.newBackgroundColor.setGeometry(250, 30, 80, 25)
 
         self.curButtonColorLabel = QtWidgets.QLabel(self)
         self.curButtonColorLabel.setGeometry(5, 60, 100, 25)
@@ -37,7 +40,7 @@ class ThemeDialog(QtWidgets.QDialog):
         self.curButtonColor.setGeometry(100, 60, 100, 25)
 
         self.newButtonColor = QtWidgets.QLineEdit(self)
-        self.newButtonColor.setGeometry(200, 60, 80, 25)
+        self.newButtonColor.setGeometry(250, 60, 80, 25)
 
         self.curButtonTextLabel = QtWidgets.QLabel(self)
         self.curButtonTextLabel.setGeometry(5, 90, 100, 25)
@@ -47,7 +50,7 @@ class ThemeDialog(QtWidgets.QDialog):
         self.curButtonTextColor.setGeometry(100, 90, 100, 25)
 
         self.newButtonTextColor = QtWidgets.QLineEdit(self)
-        self.newButtonTextColor.setGeometry(200, 90, 80, 25)
+        self.newButtonTextColor.setGeometry(250, 90, 80, 25)
 
         self.curArtBorderColorLabel = QtWidgets.QLabel(self)
         self.curArtBorderColorLabel.setGeometry(5, 120, 100, 25)
@@ -57,17 +60,17 @@ class ThemeDialog(QtWidgets.QDialog):
         self.curArtBorderColor.setGeometry(100, 120, 100, 25)
 
         self.newArtBorderColor = QtWidgets.QLineEdit(self)
-        self.newArtBorderColor.setGeometry(200, 120, 80, 25)
+        self.newArtBorderColor.setGeometry(250, 120, 80, 25)
 
         self.PosLabel = QtWidgets.QLabel(self)
         self.PosLabel.setGeometry(5, 150, 100, 25)
-        self.PosLabel.setText("Current Position")
+        self.PosLabel.setText("Current Time")
 
         self.curPosLabelColor = QtWidgets.QLabel(self)
         self.curPosLabelColor.setGeometry(100, 150, 100, 25)
 
         self.newPosColor = QtWidgets.QLineEdit(self)
-        self.newPosColor.setGeometry(200, 150, 80, 25)
+        self.newPosColor.setGeometry(250, 150, 80, 25)
 
         self.seekHandleLabel = QtWidgets.QLabel(self)
         self.seekHandleLabel.setGeometry(5, 180, 100, 25)
@@ -77,7 +80,7 @@ class ThemeDialog(QtWidgets.QDialog):
         self.curSeekHandleColor.setGeometry(100, 180, 100, 25)
 
         self.newSeekHandleColor = QtWidgets.QLineEdit(self)
-        self.newSeekHandleColor.setGeometry(200, 180, 80, 25)
+        self.newSeekHandleColor.setGeometry(250, 180, 80, 25)
 
         self.trackLengthLabel = QtWidgets.QLabel(self)
         self.trackLengthLabel.setGeometry(5, 210, 100, 25)
@@ -87,7 +90,7 @@ class ThemeDialog(QtWidgets.QDialog):
         self.curTrackLengthColor.setGeometry(100, 210, 100, 25)
 
         self.newTrackLengthColor = QtWidgets.QLineEdit(self)
-        self.newTrackLengthColor.setGeometry(200, 210, 80, 25)
+        self.newTrackLengthColor.setGeometry(250, 210, 80, 25)
 
         self.artistLabel = QtWidgets.QLabel(self)
         self.artistLabel.setGeometry(5, 240, 100, 25)
@@ -97,7 +100,7 @@ class ThemeDialog(QtWidgets.QDialog):
         self.curArtistColor.setGeometry(100, 240, 100, 25)
 
         self.newArtistColor = QtWidgets.QLineEdit(self)
-        self.newArtistColor.setGeometry(200, 240, 80, 25)
+        self.newArtistColor.setGeometry(250, 240, 80, 25)
 
         self.trackLabel = QtWidgets.QLabel(self)
         self.trackLabel.setGeometry(5, 270, 100, 25)
@@ -107,7 +110,7 @@ class ThemeDialog(QtWidgets.QDialog):
         self.curTrackColor.setGeometry(100, 270, 100, 25)
 
         self.newTrackColor = QtWidgets.QLineEdit(self)
-        self.newTrackColor.setGeometry(200, 270, 80, 25)
+        self.newTrackColor.setGeometry(250, 270, 80, 25)
 
         self.volumeBarLabel = QtWidgets.QLabel(self)
         self.volumeBarLabel.setGeometry(5, 300, 100, 25)
@@ -117,7 +120,7 @@ class ThemeDialog(QtWidgets.QDialog):
         self.curVolumeBarColor.setGeometry(100, 300, 100, 25)
 
         self.newVolumeBarColor = QtWidgets.QLineEdit(self)
-        self.newVolumeBarColor.setGeometry(200, 300, 80, 25)
+        self.newVolumeBarColor.setGeometry(250, 300, 80, 25)
 
         self.volumeHandleLabel = QtWidgets.QLabel(self)
         self.volumeHandleLabel.setGeometry(5, 330, 100, 25)
@@ -127,7 +130,7 @@ class ThemeDialog(QtWidgets.QDialog):
         self.curVolumeHandleColor.setGeometry(100, 330, 100, 25)
 
         self.newVolumeHandleColor = QtWidgets.QLineEdit(self)
-        self.newVolumeHandleColor.setGeometry(200, 330, 80, 25)
+        self.newVolumeHandleColor.setGeometry(250, 330, 80, 25)
 
         self.volumeTextLabel = QtWidgets.QLabel(self)
         self.volumeTextLabel.setGeometry(5, 360, 100, 25)
@@ -137,7 +140,7 @@ class ThemeDialog(QtWidgets.QDialog):
         self.curVolumeTextColor.setGeometry(100, 360, 100, 25)
 
         self.newVolumeTextColor = QtWidgets.QLineEdit(self)
-        self.newVolumeTextColor.setGeometry(200, 360, 80, 25)
+        self.newVolumeTextColor.setGeometry(250, 360, 80, 25)
 
         self.playlistTextLabel = QtWidgets.QLabel(self)
         self.playlistTextLabel.setGeometry(5, 390, 100, 25)
@@ -147,12 +150,12 @@ class ThemeDialog(QtWidgets.QDialog):
         self.curPlaylistTextColor.setGeometry(100, 390, 100, 25)
 
         self.newPlaylistTextColor = QtWidgets.QLineEdit(self)
-        self.newPlaylistTextColor.setGeometry(200, 390, 80, 25)
+        self.newPlaylistTextColor.setGeometry(250, 390, 80, 25)
 
         self.applyButton = QtWidgets.QPushButton("Apply", self)
         self.applyButton.setGeometry(0, 435, 95, 50)
 
-        self.saveButton = QtWidgets.QPushButton("Save", self)
+        self.saveButton = QtWidgets.QPushButton("Apply & Save", self)
         self.saveButton.setGeometry(100, 435, 95, 50)
 
         self.cancelButton = QtWidgets.QPushButton("Cancel", self)
