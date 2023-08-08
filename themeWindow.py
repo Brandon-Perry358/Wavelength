@@ -5,7 +5,7 @@ class ThemeDialog(QtWidgets.QDialog):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Change and save theme")
-        self.setGeometry(100, 100, 400, 500)
+        self.setGeometry(100, 100, 400, 550)
 
         self.labelLabel = QtWidgets.QLabel(self)
         self.labelLabel.setGeometry(5, 0, 100, 25)
@@ -25,9 +25,9 @@ class ThemeDialog(QtWidgets.QDialog):
 
         self.curBackgroundColor = QtWidgets.QLabel(self)
         self.curBackgroundColor.setGeometry(100, 30, 100, 25)
+
         self.curBackgroundColorBox = QtWidgets.QWidget(self)
         self.curBackgroundColorBox.setGeometry(160, 30, 25, 25)
-
 
         self.newBackgroundColor = QtWidgets.QLineEdit(self)
         self.newBackgroundColor.setGeometry(250, 30, 80, 25)
@@ -38,6 +38,9 @@ class ThemeDialog(QtWidgets.QDialog):
 
         self.curButtonColor = QtWidgets.QLabel(self)
         self.curButtonColor.setGeometry(100, 60, 100, 25)
+
+        self.curButtonColorBox = QtWidgets.QWidget(self)
+        self.curButtonColorBox.setGeometry(160, 60, 25, 25)
 
         self.newButtonColor = QtWidgets.QLineEdit(self)
         self.newButtonColor.setGeometry(250, 60, 80, 25)
@@ -132,34 +135,43 @@ class ThemeDialog(QtWidgets.QDialog):
         self.newVolumeHandleColor = QtWidgets.QLineEdit(self)
         self.newVolumeHandleColor.setGeometry(250, 330, 80, 25)
 
+        self.volumeBackgroundLabel = QtWidgets.QLabel(self)
+        self.volumeBackgroundLabel.setGeometry(5, 360, 100, 25)
+        self.volumeBackgroundLabel.setText("Volume Bar BG")
+
+        self.curVolumeBackgroundColor = QtWidgets.QLabel(self)
+        self.curVolumeBackgroundColor.setGeometry(100, 360, 100, 25)
+
+        self.newVolumeBackgroundColor = QtWidgets.QLineEdit(self)
+        self.newVolumeBackgroundColor.setGeometry(250, 360, 80, 25)
+
         self.volumeTextLabel = QtWidgets.QLabel(self)
-        self.volumeTextLabel.setGeometry(5, 360, 100, 25)
+        self.volumeTextLabel.setGeometry(5, 390, 100, 25)
         self.volumeTextLabel.setText("Volume Text")
 
         self.curVolumeTextColor = QtWidgets.QLabel(self)
-        self.curVolumeTextColor.setGeometry(100, 360, 100, 25)
+        self.curVolumeTextColor.setGeometry(100, 390, 100, 25)
 
         self.newVolumeTextColor = QtWidgets.QLineEdit(self)
-        self.newVolumeTextColor.setGeometry(250, 360, 80, 25)
+        self.newVolumeTextColor.setGeometry(250, 390, 80, 25)
 
         self.playlistTextLabel = QtWidgets.QLabel(self)
-        self.playlistTextLabel.setGeometry(5, 390, 100, 25)
+        self.playlistTextLabel.setGeometry(5, 420, 100, 25)
         self.playlistTextLabel.setText("Playlist Label")
 
         self.curPlaylistTextColor = QtWidgets.QLabel(self)
-        self.curPlaylistTextColor.setGeometry(100, 390, 100, 25)
+        self.curPlaylistTextColor.setGeometry(100, 420, 100, 25)
 
         self.newPlaylistTextColor = QtWidgets.QLineEdit(self)
-        self.newPlaylistTextColor.setGeometry(250, 390, 80, 25)
-
+        self.newPlaylistTextColor.setGeometry(250, 420, 80, 25)
         self.applyButton = QtWidgets.QPushButton("Apply", self)
-        self.applyButton.setGeometry(0, 435, 95, 50)
+        self.applyButton.setGeometry(0, 465, 95, 50)
 
         self.saveButton = QtWidgets.QPushButton("Apply & Save", self)
-        self.saveButton.setGeometry(100, 435, 95, 50)
+        self.saveButton.setGeometry(100, 465, 95, 50)
 
         self.cancelButton = QtWidgets.QPushButton("Cancel", self)
-        self.cancelButton.setGeometry(200, 435, 95, 50)
+        self.cancelButton.setGeometry(200, 465, 95, 50)
         self.cancelButton.clicked.connect(self.cancel)
 
 
@@ -175,6 +187,7 @@ class ThemeDialog(QtWidgets.QDialog):
                         self.newTrackColor.text(),
                         self.newVolumeBarColor.text(),
                         self.newVolumeHandleColor.text(),
+                        self.newVolumeBackgroundColor.text(),
                         self.newVolumeTextColor.text(),
                         self.newPlaylistTextColor.text()]
         return newColorList

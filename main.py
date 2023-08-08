@@ -284,8 +284,8 @@ class MainWindow(QtWidgets.QMainWindow):
 
 ##############################
 #                             GUI Colors                               #
-# self.addToPlaylistButton.setStyleSheet("background-color: #39ff14;")
 ##############################
+        # self.addToPlaylistButton.setStyleSheet("background-color: #39ff14;")
         self.windowBackgroundColor = "#000000"
         self.buttonColor = "#39ff14"
         self.buttonTextColor = "#000000"
@@ -640,7 +640,14 @@ class MainWindow(QtWidgets.QMainWindow):
             self.volBar.setGeometry(self.tradVolBarX, self.tradVolBarY, self.tradVolBarH, self.tradVolBarW)
             self.volBar.setOrientation(QtCore.Qt.Vertical)
             self.volBar.setStyleSheet(
-                "QSlider::groove:vertical {border: 1px solid #bbb; background: white; width: 10px; border-radius: 4px;}" + "QSlider::sub-page:vertical {background: #fff; border: 1px solid #777; width: 10px; border-radius: 4px;}" + "QSlider::add-page:vertical {background: #39ff14; border: 1px solid #777; width: 10px; border-radius: 4px;}" + "QSlider::handle:vertical {background: #39ff14; border: 1px solid #777; height: 13px; margin-left: -2px; margin-right: -2px; border-radius: 4px;}" + "QSlider::handle:vertical:hover {background: #39ff14; border: 1px solid #444; height: 13px; margin-left: -2px; margin-right: -2px; border-radius: 4px;}" + "QSlider::sub-page:vertical:disabled {background: #bbb; border-color: #999;}" + "QSlider::add-page:vertical:disabled {background: #eee; border-color: #999;}" + "QSlider::handle:vertical:disabled {background: #eee; border: 1px solid #aaa; border-radius: 4px;}")
+                "QSlider::groove:vertical {border: 1px solid #bbb; background: " + self.volumeBackgroundColor + "; width: 10px; border-radius: 4px;}" +
+                "QSlider::sub-page:vertical {background: " + self.volumeBackgroundColor + "; border: 1px solid #777; width: 10px; border-radius: 4px;}" +
+                "QSlider::add-page:vertical {background:" + self.volumeBarColor + "; border: 1px solid #777; width: 10px; border-radius: 4px;}" +
+                "QSlider::handle:vertical {background: " +  self.volumeHandleColor + " ; border: 1px solid #777; height: 13px; margin-left: -2px; margin-right: -2px; border-radius: 4px;}" +
+                "QSlider::handle:vertical:hover {background: " + self.volumeHandleColor + "; border: 1px solid #444; height: 13px; margin-left: -2px; margin-right: -2px; border-radius: 4px;}" +
+                "QSlider::sub-page:vertical:disabled {background: #bbb; border-color: #999;}" +
+                "QSlider::add-page:vertical:disabled {background: #eee; border-color: #999;}" +
+                "QSlider::handle:vertical:disabled {background: #eee; border: 1px solid #aaa; border-radius: 4px;}")
             self.volLabel.setGeometry(self.tradVolLabelX, self.tradVolLabelY, self.tradVolLabelH, self.tradVolLabelW)
             self.seekBar.setStyleSheet("QSlider::handle:horizontal {background-color: #39ff14;}")
             self.playlistSaveButton.setGeometry(self.tradPlaylistSaveButtonX, self.tradPlaylistSaveButtonY, self.tradPlaylistSaveButtonH, self.tradPlaylistSaveButtonW)
@@ -657,7 +664,13 @@ class MainWindow(QtWidgets.QMainWindow):
             self.playlistLabel.setGeometry(self.newPlaylistLabelX, self.newPlaylistLabelY, self.newPlaylistLabelH, self.newPlaylistLabelW)
             self.volBar.setGeometry(self.newVolBarX, self.newVolBarY, self.newVolBarH, self.newVolBarW)
             self.volBar.setStyleSheet(
-                "QSlider::groove:horizontal {border: 1px solid #bbb; background: white; height: 10px; border-radius: 4px;}" + "QSlider::sub-page:horizontal {background: #39ff14; border: 1px solid #777; height: 10px; border-radius: 4px;}" + "QSlider::add-page:horizontal {background: #fff; border: 1px solid #777; height: 10px; border-radius: 4px;}" + "QSlider::handle:horizontal {background: #39ff14; border: 1px solid #777; width: 13px; margin-top: -2px; margin-bottom: -2px; border-radius: 4px;}" + "QSlider::handle:horizontal:hover {background: #39ff14; border: 1px solid #444; width: 13px; margin-top: -2px; margin-bottom: -2px; border-radius: 4px;}" + "QSlider::sub-page:horizontal:disabled {background: #bbb; border-color: #999;}" + "QSlider::add-page:horizontal:disabled {background: #eee; border-color: #999;}" + "QSlider::handle:horizontal:disabled {background: #eee; border: 1px solid #aaa; border-radius: 4px;}")
+                "QSlider::groove:horizontal {border: 1px solid #bbb; background: " + self.volumeBackgroundColor + "; height: 10px; border-radius: 4px;}" +
+                "QSlider::sub-page:horizontal {background: " + self.volumeBarColor + "; border: 1px solid #777; height: 10px; border-radius: 4px;}" +
+                "QSlider::add-page:horizontal {background:" + self.volumeBackgroundColor + "; border: 1px solid #777; height: 10px; border-radius: 4px;}" +
+                "QSlider::handle:horizontal {background: " + self.volumeHandleColor + "; border: 1px solid #777; width: 13px; margin-top: -2px; margin-bottom: -2px; border-radius: 4px;}" +
+                "QSlider::handle:horizontal:hover {background: " + self.volumeHandleColor + "; border: 1px solid #444; width: 13px; margin-top: -2px; margin-bottom: -2px; border-radius: 4px;}" +
+                "QSlider::sub-page:horizontal:disabled {background: #bbb; border-color: #999;}" + "QSlider::add-page:horizontal:disabled {background: #eee; border-color: #999;}" +
+                "QSlider::handle:horizontal:disabled {background: #eee; border: 1px solid #aaa; border-radius: 4px;}")
             self.volBar.setOrientation(QtCore.Qt.Horizontal)
             self.volLabel.setGeometry(self.newVolLabelX, self.newVolLabelY, self.newVolLabelH, self.newVolLabelW)
             self.playlistSaveButton.setGeometry(self.newPlaylistSaveButtonX, self.newPlaylistSaveButtonY, self.newPlaylistSaveButtonH, self.newPlaylistSaveButtonW)
@@ -677,8 +690,9 @@ class MainWindow(QtWidgets.QMainWindow):
         self.themeWindow.curTrackLengthColor.setText(self.trackLengthLabelColor)
         self.themeWindow.curArtistColor.setText(self.artistTextColor)
         self.themeWindow.curTrackColor.setText(self.trackTextColor)
-        self.themeWindow.curVolumeBarColor.setText(self.volumeBackgroundColor)
+        self.themeWindow.curVolumeBarColor.setText(self.volumeBarColor)
         self.themeWindow.curVolumeHandleColor.setText(self.volumeHandleColor)
+        self.themeWindow.curVolumeBackgroundColor.setText(self.volumeBackgroundColor)
         self.themeWindow.curVolumeTextColor.setText(self.volumeLabelColor)
         self.themeWindow.curPlaylistTextColor.setText(self.playlistLabelColor)
 
@@ -696,7 +710,8 @@ class MainWindow(QtWidgets.QMainWindow):
                       self.curPosLabelColor, self.seekBarHandleColor,
                       self.trackLengthLabelColor, self.artistTextColor,
                       self.trackTextColor, self.volumeBarColor,
-                      self.volumeLabelColor, self.playlistLabelColor]
+                      self.volumeLabelColor, self.volumeBackgroundColor,
+                      self.playlistLabelColor]
 
         themeName, done = QtWidgets.QInputDialog.getText(self.saveThemeWindow, "Save Theme", "Enter Theme Name:")
 
@@ -737,8 +752,10 @@ class MainWindow(QtWidgets.QMainWindow):
                     case 10:
                         self.volumeHandleColor = x
                     case 11:
-                        self.volumeLabelColor = x
+                        self.volumeBackgroundColor = x
                     case 12:
+                        self.volumeLabelColor = x
+                    case 13:
                         self.playlistLabelColor = x
                     case _:
                         pass
@@ -771,7 +788,7 @@ class MainWindow(QtWidgets.QMainWindow):
         self.volBar.setStyleSheet(
             "QSlider::groove:horizontal {border: 1px solid #bbb; background: " + self.volumeBackgroundColor + "; height: 10px; border-radius: 4px;}" +
             "QSlider::sub-page:horizontal {background: " + self.volumeBarColor + "; border: 1px solid #777; height: 10px; border-radius: 4px;}" +
-            "QSlider::add-page:horizontal {background: #fff; border: 1px solid #777; height: 10px; border-radius: 4px;}" +
+            "QSlider::add-page:horizontal {background:" + self.volumeBackgroundColor  + " ; border: 1px solid #777; height: 10px; border-radius: 4px;}" +
             "QSlider::handle:horizontal {background: #39ff14; border: 1px solid #777; width: 13px; margin-top: -2px; margin-bottom: -2px; border-radius: 4px;}" +
             "QSlider::handle:horizontal:hover {background: " + self.volumeHandleColor + "; border: 1px solid #444; width: 13px; margin-top: -2px; margin-bottom: -2px; border-radius: 4px;}" +
             "QSlider::sub-page:horizontal:disabled {background: #bbb; border-color: #999;}" + "QSlider::add-page:horizontal:disabled {background: #eee; border-color: #999;}" +
