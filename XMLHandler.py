@@ -8,7 +8,7 @@ class XMLHandler:
             case "Themes":
                 if not os.path.isfile("./Themes.xml"):
                     f = open("Themes.xml", "w")
-                    f.write("<themes>\n</themes>")
+                    f.write("<themeRoot>\n</themeRoot>")
                     f.close()
             case "Playlist":
                 if not os.path.isfile("./Playlists.xml"):
@@ -106,9 +106,10 @@ class XMLHandler:
         ET.indent(tree, "    ", 0)
 
         themes = tree.getroot()
-        newThemeName = ET.SubElement(themes, "themeNames")
+        newThemes = ET.SubElement(themes, "Themes")
+        newThemeName = ET.SubElement(newThemes, "themeName")
         newThemeName.text = str(themeName)
-        newElementsList = ET.SubElement(newThemeName, "elementHexValues")
+        newElementsList = ET.SubElement(newThemes, "elementHexValues")
         elementNum = 1
         for x in themeArray:
             newElementX = ET.SubElement(newElementsList, "element" + str(elementNum))
@@ -119,5 +120,27 @@ class XMLHandler:
         tree.write("Themes.xml")
         return True
 
+    def getThemeNames(self):
+        retNames = []
+        tree = ET.parse("Themes.xml")
+        fillerClear = 0
+        themeRoot = tree.getroot()
+        for themes in themeRoot:
+            for themeNames in themes:
+                if fillerClear % 2 == 0:
+                    retNames.append(themeNames.text)
+                fillerClear += 1
+        return retNames
 
+    def loadThemeByName(self, themeName):
+        colorList = []
+        tree = ET.parse("Themes.xml")
+        themeRoot = tree.getroot()
+        for themes in themeRoot:
+            for themeNames in themes:
+                if themeNames.text == themeName:
+                    for colors in themes[1]:
+                        colorList.append(colors.text)
+
+        return colorList
 

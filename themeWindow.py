@@ -167,11 +167,14 @@ class ThemeDialog(QtWidgets.QDialog):
         self.applyButton = QtWidgets.QPushButton("Apply", self)
         self.applyButton.setGeometry(0, 465, 95, 50)
 
-        self.saveButton = QtWidgets.QPushButton("Apply & Save", self)
+        self.saveButton = QtWidgets.QPushButton("Apply and Save", self)
         self.saveButton.setGeometry(100, 465, 95, 50)
 
+        self.loadButton = QtWidgets.QPushButton("Load", self)
+        self.loadButton.setGeometry(200, 465, 95, 50)
+
         self.cancelButton = QtWidgets.QPushButton("Cancel", self)
-        self.cancelButton.setGeometry(200, 465, 95, 50)
+        self.cancelButton.setGeometry(300, 465, 95, 50)
         self.cancelButton.clicked.connect(self.cancel)
 
 

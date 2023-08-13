@@ -528,7 +528,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
         self.loadPlaylistList.itemDoubleClicked.connect(self.loadPlaylistFromXML)
 
-
         self.playlistToLoad = []
 
         # playlistTracks = self.XMLHandler.loadPlaylistByName("Demo Mix")
@@ -696,15 +695,17 @@ class MainWindow(QtWidgets.QMainWindow):
         self.themeWindow.curVolumeTextColor.setText(self.volumeLabelColor)
         self.themeWindow.curPlaylistTextColor.setText(self.playlistLabelColor)
 
-        self.themeWindow.applyButton.clicked.connect(self.updateColorValues)
+        self.themeWindow.applyButton.clicked.connect(self.getNewColors)
 
         self.themeWindow.saveButton.clicked.connect(self.saveTheme)
+
+        self.themeWindow.loadButton.clicked.connect(self.loadTheme)
 
         self.themeWindow.show()
 
 
     def saveTheme(self):
-        self.updateColorValues()
+        self.getNewColors()
         themeArray = [self.windowBackgroundColor, self.buttonColor,
                       self.buttonTextColor, self.albumArtBorderColor,
                       self.curPosLabelColor, self.seekBarHandleColor,
@@ -721,9 +722,11 @@ class MainWindow(QtWidgets.QMainWindow):
             else:
                 self.saveThemeIncompleteWindow.show()
 
-
-    def updateColorValues(self):
+    def getNewColors(self):
         newColors = self.themeWindow.getResponse()
+        self.updateColorValues(newColors)
+
+    def updateColorValues(self, newColors):
         for x in newColors:
             if x == "":
                 pass
@@ -795,6 +798,24 @@ class MainWindow(QtWidgets.QMainWindow):
             "QSlider::handle:horizontal:disabled {background: #eee; border: 1px solid #aaa; border-radius: 4px;}")
         self.volLabel.setStyleSheet("background-color: transparent;" + "color: " + self.volumeLabelColor + ";")
 
+    def loadTheme(self):
+        themes = self.XMLHandler.getThemeNames()
+
+        self.loadThemeList = QtWidgets.QListWidget()
+        self.loadThemeList.setWindowTitle("Double click to load theme")
+        for themeName in themes:
+            self.loadThemeList.addItem(themeName)
+
+        self.loadThemeList.setGeometry(250, 100, 400, 300)
+        self.loadThemeList.show()
+
+        self.loadThemeList.itemDoubleClicked.connect(self.loadThemeFromXML)
+
+    def loadThemeFromXML(self, themeName):
+        newColors = self.XMLHandler.loadThemeByName(themeName.text())
+        self.updateColorValues(newColors)
+        self.updateTheme()
+        self.loadThemeList.hide()
 
 def updateSongPos(window, player):
     while True:
