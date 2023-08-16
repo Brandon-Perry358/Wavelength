@@ -15,9 +15,12 @@ class XMLHandler:
                     f = open("Playlists.xml", "w")
                     f.write("<playlists>\n</playlists>")
                     f.close()
-            case "OnStart":
-                if not os.path.isfile("./OnStart.xml"):
-                    f = open("OnStart.xml", "w")
+            case "Startup":
+                if not os.path.isfile("./Startup.xml"):
+                    self.fileCheck("Themes")
+                    self.fileCheck("Playlist")
+                    f = open("Startup.xml", "w")
+                    f.write("<startupRoot>\n   <playlist>None</playlist>\n   <theme>None</theme>\n</startupRoot>")
                     f.close()
 
     def getTracklist(self, previousSongs, currentSongs, nextSongs):
@@ -143,4 +146,45 @@ class XMLHandler:
                         colorList.append(colors.text)
 
         return colorList
+
+
+    def changeStartupPlaylist(self, playlistName):
+        self.fileCheck("Startup")
+
+        tree = ET.parse('Startup.xml')
+        ET.indent(tree,  "    ", 0)
+
+        startupRoot = tree.getroot()
+        startupRoot[0].text = playlistName.text()
+        tree.write("Startup.xml")
+        # print(startupRoot[0].text)
+        # print(startupRoot[0].tag)
+        # print(startupRoot[0].attrib)
+
+    def changeStartupTheme(self, themeName):
+        self.fileCheck("Startup")
+
+        tree = ET.parse('Startup.xml')
+        ET.indent(tree,  "    ", 0)
+
+        startupRoot = tree.getroot()
+        startupRoot[1].text = themeName.text()
+        tree.write("Startup.xml")
+        # print(startupRoot[1].text)
+        # print(startupRoot[1].tag)
+        # print(startupRoot[1].attrib)
+
+    def readStartup(self):
+        self.fileCheck("Startup")
+
+        retData = []
+
+        tree = ET.parse('Startup.xml')
+        ET.indent(tree, "    ", 0)
+
+        startupRoot = tree.getroot()
+        retData.append(startupRoot[0].text)
+        retData.append(startupRoot[1].text)
+
+        return retData
 

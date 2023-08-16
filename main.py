@@ -12,6 +12,8 @@ from tinytag import tinytag
 import XMLHandler
 # Our Theme changing/saving window
 import themeWindow
+# Our startup settings window
+import startupSettings
 
 
 def play_audio(queue, mainWindow):
@@ -286,6 +288,7 @@ class MainWindow(QtWidgets.QMainWindow):
 #                             GUI Colors                               #
 ##############################
         # self.addToPlaylistButton.setStyleSheet("background-color: #39ff14;")
+        self.newColors = None
         self.windowBackgroundColor = "#000000"
         self.buttonColor = "#39ff14"
         self.buttonTextColor = "#000000"
@@ -307,7 +310,9 @@ class MainWindow(QtWidgets.QMainWindow):
 #                          Other Windows                            #
 ##############################
 
-        self.themeWindow = None
+        self.themeWindow = themeWindow.ThemeDialog()
+
+        self.startupWindow = startupSettings.startupDialog()
 
         self.savePlaylistWindow = QtWidgets.QMessageBox()
         self.savePlaylistWindow.setWindowTitle("Save Playlist")
@@ -365,6 +370,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.saveThemeButton.clicked.connect(self.changeSaveTheme)
         self.saveThemeButton.move(300, 0)
 
+        self.startupButton = QtWidgets.QPushButton("Startup", self)
+        self.startupButton.setFont(QtGui.QFont("Helvetica", 10, QtGui.QFont.Bold))
+        self.startupButton.setStyleSheet("background-color:" + self.buttonColor + "; color: " + self.buttonTextColor + ";")
+        self.startupButton.clicked.connect(self.startupWindow.show)
+        self.startupButton.move(400, 0)
+
         self.albumArt = QtWidgets.QLabel(self)
         self.albumPixmap = QtGui.QPixmap()
         self.albumArt.setPixmap(QtGui.QPixmap("WavelengthArt.png"))
@@ -400,13 +411,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # make a list widget to display the playlist
         self.playlistWidget = QtWidgets.QListWidget(self)
-        self.playlistWidget.setGeometry(500, 40, 255, 360)
+        self.playlistWidget.setGeometry(510, 40, 255, 360)
         # set the color of the widget to white
         self.playlistWidget.setStyleSheet("background-color: white;")
 
         # make a label for the playlist widget above the top left corner
         self.playlistLabel = QtWidgets.QLabel(self)
-        self.playlistLabel.setGeometry(500, 9, 250, 40)
+        self.playlistLabel.setGeometry(510, 9, 250, 40)
         self.playlistLabel.setText("Playing Next:")
         # set the color of the label to neon green
         self.playlistLabel.setStyleSheet("background-color: transparent;" + "color: " + self.playlistLabelColor + ";")
@@ -414,13 +425,13 @@ class MainWindow(QtWidgets.QMainWindow):
 
         # make playlist save button
         self.playlistSaveButton = QtWidgets.QPushButton("Save Playlist", self)
-        self.playlistSaveButton.setGeometry(605, 20, 75, 20)
+        self.playlistSaveButton.setGeometry(615, 20, 75, 20)
         self.playlistSaveButton.setStyleSheet("background-color:" + self.buttonColor + "; color: " + self.buttonTextColor + ";")
         self.playlistSaveButton.clicked.connect(self.savePlaylist)
 
         # make playlist load button
         self.playlistLoadButton = QtWidgets.QPushButton("Load Playlist", self)
-        self.playlistLoadButton.setGeometry(680, 20, 75, 20)
+        self.playlistLoadButton.setGeometry(690, 20, 75, 20)
         self.playlistLoadButton.setStyleSheet("background-color:" + self.buttonColor + "; color: " + self.buttonTextColor + ";")
         self.playlistLoadButton.clicked.connect(self.loadPlaylist)
 
@@ -495,6 +506,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.volLabel.setStyleSheet("background-color: transparent;" + "color: " + self.volumeLabelColor + ";")
         self.volLabel.setFont(QtGui.QFont("Helvetica", 11, QtGui.QFont.Bold))
 
+
+        self.XMLHandler.fileCheck("Startup")
+        self.startupData = self.XMLHandler.readStartup()
+        self.loadPlaylistFromXML(self.startupData[0])
+        self.loadThemeFromXML(self.startupData[1])
+
         self.destroyed.connect(lambda: queue.put("close"))
 
 
@@ -534,9 +551,15 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def loadPlaylistFromXML(self, playlist):
         # print(playlist.text())
-        self.playlistToLoad = self.XMLHandler.loadPlaylistByName(playlist.text())
-        queue.put("load playlist")
-        self.loadPlaylistList.hide()
+        if type(playlist) == str:
+            if playlist == "None":
+                pass
+            self.playlistToLoad = self.XMLHandler.loadPlaylistByName(playlist)
+            queue.put("load playlist")
+        else:
+            self.playlistToLoad = self.XMLHandler.loadPlaylistByName(playlist.text())
+            queue.put("load playlist")
+            self.loadPlaylistList.hide()
 
 
 
@@ -678,7 +701,6 @@ class MainWindow(QtWidgets.QMainWindow):
 
 
     def changeSaveTheme(self):
-        self.themeWindow = themeWindow.ThemeDialog()
         self.themeWindow.curBackgroundColor.setText(self.windowBackgroundColor)
         self.themeWindow.curBackgroundColorBox.setStyleSheet("background-color: " + self.windowBackgroundColor + ";")
         self.themeWindow.curButtonColor.setText(self.buttonColor)
@@ -812,10 +834,15 @@ class MainWindow(QtWidgets.QMainWindow):
         self.loadThemeList.itemDoubleClicked.connect(self.loadThemeFromXML)
 
     def loadThemeFromXML(self, themeName):
-        newColors = self.XMLHandler.loadThemeByName(themeName.text())
-        self.updateColorValues(newColors)
+        if type(themeName) == str:
+            if themeName == "None":
+                pass
+            self.newColors = self.XMLHandler.loadThemeByName(themeName)
+        else:
+            self.newColors = self.XMLHandler.loadThemeByName(themeName.text())
+            self.loadThemeList.hide()
+        self.updateColorValues(self.newColors)
         self.updateTheme()
-        self.loadThemeList.hide()
 
 def updateSongPos(window, player):
     while True:
