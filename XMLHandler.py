@@ -32,30 +32,30 @@ class XMLHandler:
 
     def playlistWriter(self, playlistName, tracklist):
         self.fileCheck("Playlist")
+        if self.nameValidation("Playlist", playlistName):
 
-        tree = ET.parse('Playlists.xml')
-        ET.indent(tree, "    ", 0)
+            tree = ET.parse('Playlists.xml')
+            ET.indent(tree, "    ", 0)
 
-        playlists = tree.getroot()
-        newPlaylist = ET.SubElement(playlists, "playlist")
-        newPlaylistName = ET.SubElement(newPlaylist, "playlistName")
-        newPlaylistName.text = str(playlistName)
-        newTrackList = ET.SubElement(newPlaylist, "tracks")
-        trackNum = 1
-        for x in tracklist:
-            newTrackX = ET.SubElement(newTrackList, "track"+str(trackNum))
-            newTrackX.text = str(x)
-            trackNum += 1
-
-        # If successful commit
-        tree.write("Playlists.xml")
-        return True
+            playlists = tree.getroot()
+            newPlaylist = ET.SubElement(playlists, "playlist")
+            newPlaylistName = ET.SubElement(newPlaylist, "playlistName")
+            newPlaylistName.text = str(playlistName)
+            newTrackList = ET.SubElement(newPlaylist, "tracks")
+            trackNum = 1
+            for x in tracklist:
+                newTrackX = ET.SubElement(newTrackList, "track"+str(trackNum))
+                newTrackX.text = str(x)
+                trackNum += 1
+           # If successful commit
+            tree.write("Playlists.xml")
+            return True
+        else:
+            return False
 
     def savePlaylist(self, playlistName, previousSongs, currentSongs, nextSongs):
         self.fileCheck("Playlist")
-        # Check if playlist name already exists
         tracklist = self.getTracklist(previousSongs, currentSongs, nextSongs)
-        #self.playlistWriter(playlistName, tracklist)
         return self.playlistWriter(playlistName, tracklist)
 
 # Used to figure out structure in xml library
@@ -102,26 +102,26 @@ class XMLHandler:
 
     def saveTheme(self, themeName, themeArray):
         self.fileCheck("Themes")
-        # TODO Check if theme exists
+        if self.nameValidation("Theme", themeName):
+            tree = ET.parse('Themes.xml')
+            ET.indent(tree, "    ", 0)
 
-        # if theme does not already exist
-        tree = ET.parse('Themes.xml')
-        ET.indent(tree, "    ", 0)
+            themes = tree.getroot()
+            newThemes = ET.SubElement(themes, "Themes")
+            newThemeName = ET.SubElement(newThemes, "themeName")
+            newThemeName.text = str(themeName)
+            newElementsList = ET.SubElement(newThemes, "elementHexValues")
+            elementNum = 1
+            for x in themeArray:
+                newElementX = ET.SubElement(newElementsList, "element" + str(elementNum))
+                newElementX.text = str(x)
+                elementNum += 1
 
-        themes = tree.getroot()
-        newThemes = ET.SubElement(themes, "Themes")
-        newThemeName = ET.SubElement(newThemes, "themeName")
-        newThemeName.text = str(themeName)
-        newElementsList = ET.SubElement(newThemes, "elementHexValues")
-        elementNum = 1
-        for x in themeArray:
-            newElementX = ET.SubElement(newElementsList, "element" + str(elementNum))
-            newElementX.text = str(x)
-            elementNum += 1
-
-        # If successful commit
-        tree.write("Themes.xml")
-        return True
+            # If successful commit
+            tree.write("Themes.xml")
+            return True
+        else:
+            return False
 
     def getThemeNames(self):
         retNames = []
@@ -188,3 +188,16 @@ class XMLHandler:
 
         return retData
 
+    def nameValidation(self, nameType, name):
+        if nameType == "Theme":
+            themeList = self.getThemeNames()
+            for x in themeList:
+                if name == x:
+                    return False
+            return True
+        elif nameType == "Playlist":
+            playlistList = self.getPlaylistNames()
+            for x in playlistList:
+                if name == x:
+                    return False
+            return True

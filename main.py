@@ -253,12 +253,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tradTrackLengthW = 30
 
         self.tradPlaylistX = 450
-        self.tradPlaylistY = 40
+        self.tradPlaylistY = 50
         self.tradPlaylistH = 250
         self.tradPlaylistW = 360
 
         self.tradPlaylistLabelX = 450
-        self.tradPlaylistLabelY = 9
+        self.tradPlaylistLabelY = 19
         self.tradPlaylistLabelH = 250
         self.tradPlaylistLabelW = 40
 
@@ -273,12 +273,12 @@ class MainWindow(QtWidgets.QMainWindow):
         self.tradVolLabelW = 25
 
         self.tradPlaylistSaveButtonX = 555
-        self.tradPlaylistSaveButtonY = 20
+        self.tradPlaylistSaveButtonY = 30
         self.tradPlaylistSaveButtonH = 75
         self.tradPlaylistSaveButtonW = 20
 
         self.tradPlaylistLoadButtonX = 630
-        self.tradPlaylistLoadButtonY = 20
+        self.tradPlaylistLoadButtonY = 30
         self.tradPlaylistLoadButtonH = 70
         self.tradPlaylistLoadButtonW = 20
 
@@ -704,18 +704,31 @@ class MainWindow(QtWidgets.QMainWindow):
         self.themeWindow.curBackgroundColor.setText(self.windowBackgroundColor)
         self.themeWindow.curBackgroundColorBox.setStyleSheet("background-color: " + self.windowBackgroundColor + ";")
         self.themeWindow.curButtonColor.setText(self.buttonColor)
+        self.themeWindow.curButtonColorBox.setStyleSheet("background-color: " + self.buttonColor + ";")
         self.themeWindow.curButtonTextColor.setText(self.buttonTextColor)
+        self.themeWindow.curButtonTextColorBox.setStyleSheet("background-color: " + self.buttonTextColor + ";")
         self.themeWindow.curArtBorderColor.setText(self.albumArtBorderColor)
+        self.themeWindow.curArtBorderColorBox.setStyleSheet("background-color: " + self.albumArtBorderColor + ";")
         self.themeWindow.curPosLabelColor.setText(self.curPosLabelColor)
+        self.themeWindow.curPosLabelColorBox.setStyleSheet("background-color: " + self.curPosLabelColor + ";")
         self.themeWindow.curSeekHandleColor.setText(self.seekBarHandleColor)
+        self.themeWindow.curSeekHandleColorBox.setStyleSheet("background-color: " + self.seekBarHandleColor + ";")
         self.themeWindow.curTrackLengthColor.setText(self.trackLengthLabelColor)
+        self.themeWindow.curTrackLengthColorBox.setStyleSheet("background-color: " + self.trackLengthLabelColor + ";")
         self.themeWindow.curArtistColor.setText(self.artistTextColor)
+        self.themeWindow.curArtistColorBox.setStyleSheet("background-color: " + self.artistTextColor + ";")
         self.themeWindow.curTrackColor.setText(self.trackTextColor)
+        self.themeWindow.curTrackColorBox.setStyleSheet("background-color: " + self.trackTextColor + ";")
         self.themeWindow.curVolumeBarColor.setText(self.volumeBarColor)
+        self.themeWindow.curVolumeBarColorBox.setStyleSheet("background-color:" + self.volumeBarColor + ";")
         self.themeWindow.curVolumeHandleColor.setText(self.volumeHandleColor)
+        self.themeWindow.curVolumeHandleColorBox.setStyleSheet("background-color: " + self.volumeHandleColor + ";")
         self.themeWindow.curVolumeBackgroundColor.setText(self.volumeBackgroundColor)
+        self.themeWindow.curVolumeBackgroundColorBox.setStyleSheet("background-color: " + self.volumeBackgroundColor + ";")
         self.themeWindow.curVolumeTextColor.setText(self.volumeLabelColor)
+        self.themeWindow.curVolumeTextColorBox.setStyleSheet("background-color: " + self.volumeLabelColor + ";")
         self.themeWindow.curPlaylistTextColor.setText(self.playlistLabelColor)
+        self.themeWindow.curPlaylistTextColorBox.setStyleSheet("background-color: " + self.playlistLabelColor + ";")
 
         self.themeWindow.applyButton.clicked.connect(self.getNewColors)
 
@@ -746,14 +759,28 @@ class MainWindow(QtWidgets.QMainWindow):
 
     def getNewColors(self):
         newColors = self.themeWindow.getResponse()
+        colorIndex = 0
+        for x in newColors:
+            if x == "":
+                pass
+            elif len(x) > 7:
+                newColors[colorIndex] = ""
+            elif len(x) < 6:
+                newColors[colorIndex] = ""
+            elif len(x) == 6:
+                newColors[colorIndex] = "#" + x
+            if len(x) == 7 and x[0] != "#":
+                newColors[colorIndex] = ""
+            colorIndex += 1
         self.updateColorValues(newColors)
 
     def updateColorValues(self, newColors):
+        colorIndex = 0
         for x in newColors:
             if x == "":
                 pass
             else:
-                match newColors.index(x):
+                match colorIndex:
                     case 0:
                         self.windowBackgroundColor = x
                     case 1:
@@ -784,6 +811,7 @@ class MainWindow(QtWidgets.QMainWindow):
                         self.playlistLabelColor = x
                     case _:
                         pass
+            colorIndex += 1
         self.updateTheme()
         self.themeWindow.close()
 
